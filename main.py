@@ -138,5 +138,5 @@ word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe Wo
 # de setat variabilele pentru scrierea calculelor capacitatii HDD-urilor
 
 
-#!!!F important, de retinut ca modulul TVCI_tbl_consum_alege_UPS sa ruleze inainte de a rula
+#!!!FFF important, de retinut ca modulul TVCI_tbl_consum_alege_UPS sa ruleze inainte de a rula
 # modulul TVCI_lista_echipamente, altfel UPS-urile nu vor fi scrise in lista de cantitati
