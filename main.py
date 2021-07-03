@@ -20,6 +20,10 @@ from TVCI_lista_echipamente import TVCI_equipment_qty_table
 from TVCI_jurnal_cabluri import *
 from TVCI_calcul_capacit_HDD import calcule_HDD_TVCI
 
+'''Importare module de test'''
+from Test_upload_many_lines import fct_ce_printez
+dict_printare_caract_tehnice = fct_ce_printez()
+
 #creare fisier template in care se vor scrie toate valorile rezultate prin rularea modulelor python
 template = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\doc_IP_cam.docx')
 
@@ -88,7 +92,7 @@ for i in range(len(dict_TVCI_tabel_consum_electric)):
 ''' instructiunea de mai jos scrie elementele de sub tabelele de calcul consum curent de la TVCI'''
 # variabila dict_TVCI_calcule_UPS = calcule_UPS_TVCI() contine o lista de dictionare
 # functia de scriere a variabilelor in word ia ca argument valori in urmatorul mod document.merge(var1 = 'text1', var2 = 'text2', etc)
-# pentru ca am o lista de dictionare, iterez lista si prin (**ddict_TVCI_calcule_UPS[i]) convertesc dictionarul
+# pentru ca am o lista de dictionare, iterez lista si prin (**dict_TVCI_calcule_UPS[i]) convertesc dictionarul
 # in valori de tipul (var1 = 'text1', var2 = 'text2', etc) astfel incat sa poata fi scrise in fisierul word.
 for i in range(len(dict_TVCI_calcule_UPS)):
     word_document.merge(**dict_TVCI_calcule_UPS[i])
@@ -108,6 +112,11 @@ for i in range(len(dict_TVCI_capacitate_UPS)):
 # in valori de tipul (var1 = 'text1', var2 = 'text2', etc) astfel incat sa poata fi scrise in fisierul word.
 for i in range(len(dict_TVCI_calcule_HDD)):
     word_document.merge(**dict_TVCI_calcule_HDD[i])
+
+''' instructiunea de mai jos scrie caracteristicile tehnice ale echipamentelor de la efractie, TVCI'''
+for i in range(len(dict_printare_caract_tehnice)):
+    word_document.merge(**dict_printare_caract_tehnice[i])
+
 
 
 #word_document.merge(efr_consum_SA0='CE', efr_i_veghe_SA0='0.5345', efr_i_alarma_SA0='0.8658', efr_acc_SA0 = '18', efr_nr_acc_SA0 = '0.92', efr_acc_rounded_SA0 = '1', efr_consum_SA1 = 'SA1', efr_i_veghe_SA1 = '0.0480', efr_i_alarma_SA1 = '0.0720', efr_acc_SA1 = '7', efr_nr_acc_SA1 = '0.21', efr_acc_rounded_SA1 = '1', efr_consum_SA2 = 'SA2', efr_i_veghe_SA2 = '0.0480', efr_i_alarma_SA2 = '0.0720', efr_acc_SA2 = '7', efr_nr_acc_SA2 = '0.21', efr_acc_rounded_SA2 = '1', efr_consum_SA3 = 'SA3', efr_i_veghe_SA3 = '0.0720', efr_i_alarma_SA3 = '0.1080', efr_acc_SA3 = '7', efr_nr_acc_SA3 = '0.32', efr_acc_rounded_SA3 = '1', efr_consum_SA4 = 'SA4', efr_i_veghe_SA4 = '0.0960', efr_i_alarma_SA4 = '0.1440', efr_acc_SA4 = '7', efr_nr_acc_SA4 = '0.42', efr_acc_rounded_SA4 = '1')
