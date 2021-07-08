@@ -201,7 +201,7 @@ def journal_cables_table(zonare_table):
                                     'Până la': 'efr_jurnal_pana_la',
                                     'Tip cablu': 'efr_jurnal_tip_cablu'}, inplace=True)
     dict_df_result_to_word = df_result_to_word.to_dict('records')
-    print(dict_df_result_to_word)
+    #print(dict_df_result_to_word)
     return dict_df_result_to_word
 
 

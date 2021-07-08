@@ -126,7 +126,7 @@ def jurnal_cabluri_TVCI(video_balun_code, cable_type_video):
     for i in range(len(df_jurnal_cabluri_camere['nr_crt'])):
         lista_cod_cablu_TVCI.append('T'+ str(i+1))
     df_jurnal_cabluri_camere['cod_cablu'] = lista_cod_cablu_TVCI
-    print(df_jurnal_cabluri_camere)
+    #print(df_jurnal_cabluri_camere)
     df_jurnal_cabluri_camere = df_jurnal_cabluri_camere.astype(str)
     df_jurnal_cabluri_camere.rename(columns={'nr_crt' : 'TVCI_jurnal_nr_crt',
                                              'cod_cablu' : 'TVCI_jurnal_cod_cablu',
@@ -137,7 +137,7 @@ def jurnal_cabluri_TVCI(video_balun_code, cable_type_video):
                                              'Pana la alimentare' : 'TVCI_jurnal_alim_pana_la',
                                              'Tip cablu alimentare' : 'TVCI_jurnal_alim_tip_cablu'}, inplace = True)
     dict_jurnal_cabluri_TVCI = df_jurnal_cabluri_camere.to_dict('records')
-    print(dict_jurnal_cabluri_TVCI)
+    #print(dict_jurnal_cabluri_TVCI)
     return dict_jurnal_cabluri_TVCI
 
 

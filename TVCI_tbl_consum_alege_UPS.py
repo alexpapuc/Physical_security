@@ -116,7 +116,7 @@ def choose_UPS_from_db_TVCI(total_consumption_VA, i_din_write_consumption_tables
     dict_df_UPS = df_UPS.to_dict(orient='records')
     copy_of_dict_df_UPS = dict_df_UPS.copy()
     lst_UPS_calculate.append(copy_of_dict_df_UPS)
-    print('a rulat functia care face append')
+    #print('a rulat functia care face append')
     #return print(dict_df_UPS)
 
     #creez o variabila pe care o voi salva sub forma de dictionar ce contine puterea in VA a UPS-urilor calculate

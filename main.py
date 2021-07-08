@@ -80,7 +80,7 @@ for i in range(len(dict_antiefractie_var_surse_alimentare)):
     word_document.merge(**dict_antiefractie_var_surse_alimentare[i])
 
 print('scrie tabelele de calcul consum curent de la TVCI')
-print(dict_TVCI_tabel_consum_electric)
+#print(dict_TVCI_tabel_consum_electric)
 ''' instructiunea de mai jos scrie tabelele de calcul consum curent de la TVCI'''
 # prin functia tabele_consum_TVCI() importam o lista de dictionare
 # variabila dict_TVCI_tabel_consum_electric contine o lista de dictionare

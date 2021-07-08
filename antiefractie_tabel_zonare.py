@@ -129,7 +129,7 @@ def creare_tabel_zonare():
                                         'PARTITIE': 'efr_zonare_partitie',
                                         'DENUMIRE_ZONA_PROTEJATA': 'efr_zonare_zona_protejata'}, inplace=True)
         dict_df_zonare_table = df_zonare_table.to_dict('records')
-        print(dict_df_zonare_table)
+        #print(dict_df_zonare_table)
         return dict_df_zonare_table
 
 
@@ -169,7 +169,7 @@ def creare_tabel_zonare():
                                         'PARTITIE': 'efr_zonare_partitie',
                                         'DENUMIRE_ZONA_PROTEJATA': 'efr_zonare_zona_protejata'}, inplace=True)
         dict_df_zonare_table = df_zonare_table.to_dict('records')
-        print(dict_df_zonare_table)
+        #print(dict_df_zonare_table)
         return dict_df_zonare_table
 
 if __name__ == '__main__':
