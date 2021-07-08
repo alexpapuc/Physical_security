@@ -7,7 +7,9 @@
 import pandas as pd
 from TVCI_calcul_capacit_HDD import hdd_calculation_and_add_in_equipments_list
 from TVCI_Video_Balun import add_video_balun_to_list_of_qty
-from TVCI_tbl_consum_alege_UPS import ups_calculate
+from TVCI_tbl_consum_alege_UPS import *
+
+
 
 df_db_TVCI = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_TVCI.xlsx')
 df_TVCI_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\TVCI.txt', delimiter="\t")
@@ -42,7 +44,9 @@ df_video_balun = pd.DataFrame(dict_video_balun)
 ########################
 
 ########################
+rulare_modul_care_creaza_lista_UPS_calculate = write_consumption_tables_in_excel()
 lista_UPS_calculate = ups_calculate()
+#print(lista_UPS_calculate)
 #pentru a putea crea dataframe pt UPS, avem nevoie ca list dict_UPS sa fie o lista de dictionare, nu o lista de liste de dictionare
 #pentru a avea ca rezultat o lista de dictionare dintr-o lista de liste de dictionare, folosim nested for de mai jos
 lista_simpla = []

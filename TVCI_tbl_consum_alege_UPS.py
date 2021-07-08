@@ -116,6 +116,7 @@ def choose_UPS_from_db_TVCI(total_consumption_VA, i_din_write_consumption_tables
     dict_df_UPS = df_UPS.to_dict(orient='records')
     copy_of_dict_df_UPS = dict_df_UPS.copy()
     lst_UPS_calculate.append(copy_of_dict_df_UPS)
+    print('a rulat functia care face append')
     #return print(dict_df_UPS)
 
     #creez o variabila pe care o voi salva sub forma de dictionar ce contine puterea in VA a UPS-urilor calculate
@@ -128,6 +129,7 @@ def choose_UPS_from_db_TVCI(total_consumption_VA, i_din_write_consumption_tables
 
     lst_p_aparenta_UPS.append(dict_p_aparenta_UPS)
 
+    return lst_UPS_calculate
     # dict_df_p_aparenta_UPS = df_p_aparenta_UPS(orient='records')
     # copy_of_dict_df_p_aparenta_UPS = dict_df_p_aparenta_UPS.copy()
     # lst_p_aparenta_UPS.append(copy_of_dict_df_p_aparenta_UPS)
@@ -174,7 +176,6 @@ def write_consumption_tables_in_excel():
         lst_calcule_UPS.append(dict_val_calcul_UPS_TVCI)
 
 
-write_consumption_tables_in_excel()
 
 #functia ups_calculate() aduce lista de dictionare lst_UPS_calculate, o salveaza in variabila list_UPS_calculate si
 # o retuneaza pentru a fi utilizata in modulul TVCI_lista echipamente pentru a adauga UPS-urile in lista de echipamente.

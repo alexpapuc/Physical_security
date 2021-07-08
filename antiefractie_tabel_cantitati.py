@@ -1,10 +1,12 @@
 import pandas as pd
 from antiefractie import calcul_capacitate_acumulatoare
 df_db = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_efractie.xlsx')
-# df_read_zonare = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.txt',
-#                              delimiter="\t")
+df_read_zonare = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.txt',
+                             delimiter="\t")
 
-print(df_acumulatoare)
+#print(df_acumulatoare)
+
+
 
 def creare_tabel_lista_cantitati():
     # global df_intrussion_dwg
@@ -20,8 +22,7 @@ def creare_tabel_lista_cantitati():
 
     # creez dataframe-ul pt a afisa ce coloane ma intereseaza si fac filtrarea in functie de coloana 'Nr. Crt'
     # pt ca nu vreau sa afisez coloana 'Nr. Crt', fac atribuirea df-ului la el insusi dar fara coloana 'Nr. Crt'
-    final_qty_table[
-        ['Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor', 'Document insotior', 'Nr. Crt']]
+
     final_qty_table = pd.DataFrame(final_qty_table[
                                        ['Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor',
                                         'Document insotior', 'Nr. Crt']]).sort_values(by='Nr. Crt', ascending=True)
@@ -48,6 +49,7 @@ def creare_tabel_lista_cantitati():
     df_final_qty_table_for_word = df_final_qty_table_for_word[
         ['nr_crt_cantitati', 'Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor',
          'Document insotior']]
+
     df_final_qty_table_for_word = df_final_qty_table_for_word.astype(str)
     df_final_qty_table_for_word.rename(columns={'nr_crt_cantitati': 'efr_cantitati_nr_crt',
                                                 'Denumire_element': 'efr_cantitati_denumire_element',
@@ -57,5 +59,6 @@ def creare_tabel_lista_cantitati():
                                                 'Furnizor': 'efr_cantitati_furnizor',
                                                 'Document insotior': 'efr_cantitati_CE'}, inplace=True)
     dict_df_final_qty_table_for_word = df_final_qty_table_for_word.to_dict('records')
-    print(dict_df_final_qty_table_for_word)
+    # print(dict_df_final_qty_table_for_word)
     return dict_df_final_qty_table_for_word
+

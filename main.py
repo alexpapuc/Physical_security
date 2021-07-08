@@ -20,9 +20,7 @@ from TVCI_lista_echipamente import TVCI_equipment_qty_table
 from TVCI_jurnal_cabluri import *
 from TVCI_calcul_capacit_HDD import calcule_HDD_TVCI
 
-'''Importare module de test'''
-from Test_upload_many_lines import fct_ce_printez
-dict_printare_caract_tehnice = fct_ce_printez()
+
 
 #creare fisier template in care se vor scrie toate valorile rezultate prin rularea modulelor python
 template = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\doc_IP_cam.docx')
@@ -36,21 +34,21 @@ dict_antiefractie_creare_tabel_jurnal_cabluri = journal_cables_table(zonare_tabl
 
 '''Crarea variabile in care stocam dictionarele cu key si val pt tabelele TVCI'''
 dict_TVCI_tabel_amplasare_camere = TVCI_camera_labels()
-dict_run_modul_TVCI_tbl_consum_alege_UPS = write_consumption_tables_in_excel()
+#dict_run_modul_TVCI_tbl_consum_alege_UPS = write_consumption_tables_in_excel()
 dict_TVCI_calcule_UPS = calcule_UPS_TVCI()
 dict_TVCI_capacitate_UPS = putere_aparenta_UPS_calculate()
 dict_TVCI_tabel_consum_electric = tabele_consum_TVCI()
 dict_TVCI_tabel_lista_cantitati = TVCI_equipment_qty_table() # de avut in vedere ca acest modul sa ruleze dupa TVCI_tbl_consum_alege_UPS
 dict_TVCI_tabel_jurnal_cabluri = jurnal_cabluri_TVCI(video_balun_code, cable_type_video)
 dict_TVCI_calcule_HDD = calcule_HDD_TVCI()
-#print(dict_TVCI_tabel_consum_electric)
+
 
 '''Citim fisierul template'''
 word_document = MailMerge(template)
 print(word_document.get_merge_fields())
 
 
-
+print('scrie tabele cantitati, zonare, jurnal efr si TVCI')
 ''' instructiunea de mai jos scrie tabelele: lista cantitati, zonare, jurnal cabluri  de la antiefractie, TVCI'''
 #pt a scrie cu succes in tabelul din word folosim ca si cheie, denumirea variabilei primei coloane din stanga a
 #tabelului din word(vezi ex de mai jos)
@@ -60,19 +58,19 @@ word_document.merge_templates([{'efr_cantitati_nr_crt': dict_antiefractie_creare
                                 'efr_zonare_nr_crt': dict_antiefractie_creare_tabel_zonare,
                                 'TVCI_zonare_nr_crt':dict_TVCI_tabel_amplasare_camere,
                                 'efr_jurnal_nr_crt': dict_antiefractie_creare_tabel_jurnal_cabluri,
-                                'TVCI_jurnal_nr_crt' : dict_TVCI_tabel_jurnal_cabluri,
-                                }
+                                'TVCI_jurnal_nr_crt' : dict_TVCI_tabel_jurnal_cabluri
+                                },
                                ], separator='page_break')
 
-
+print('scrie tabele calcul acumulatoare efractie')
 ''' instructiunea de mai jos scrie tabelele de calcul al acumulatoarelor de la antiefractie'''
 # prin functia tabele consum importam o lista de dictionare
 # variabila dict_antiefractie_creare_tabel_calcul_acumulator_efractie contine o lista de dictionare
 for i in range(len(dict_antiefractie_creare_tabel_calcul_acumulator_efractie)):
-    word_document.merge_templates([{'efr_consum_nr_crt'+str(i) : dict_antiefractie_creare_tabel_calcul_acumulator_efractie[i],
-                                    }
-                                   ], separator='page_break')
+    word_document.merge_templates([{'efr_consum_nr_crt'+str(i) : dict_antiefractie_creare_tabel_calcul_acumulator_efractie[i]
+                                    },], separator='page_break')
 
+print('scrie rezultate calcule sub tabele efractie')
 ''' instructiunea de mai jos scrie elementele de sub tabelele de calcul al acumulatoarelor de la antiefractie'''
 # variabila dict_antiefractie_var_surse_alimentare = var_surse_alim() contine o lista de dictionare
 # functia de scriere a variabilelor in word ia ca argument valori in urmatorul mod document.merge(var1 = 'text1', var2 = 'text2', etc)
@@ -81,14 +79,17 @@ for i in range(len(dict_antiefractie_creare_tabel_calcul_acumulator_efractie)):
 for i in range(len(dict_antiefractie_var_surse_alimentare)):
     word_document.merge(**dict_antiefractie_var_surse_alimentare[i])
 
+print('scrie tabelele de calcul consum curent de la TVCI')
+print(dict_TVCI_tabel_consum_electric)
 ''' instructiunea de mai jos scrie tabelele de calcul consum curent de la TVCI'''
 # prin functia tabele_consum_TVCI() importam o lista de dictionare
 # variabila dict_TVCI_tabel_consum_electric contine o lista de dictionare
 for i in range(len(dict_TVCI_tabel_consum_electric)):
-    word_document.merge_templates([{'TVCI_consum_nr_crt'+str(i) : dict_TVCI_tabel_consum_electric[i],
-                                    }
-                                   ], separator='page_break')
+    print(i)
+    word_document.merge_templates([{'TVCI_consum_nr_crt'+str(i) : dict_TVCI_tabel_consum_electric[i]
+                                    },], separator='page_break')
 
+print('scrie elementele de sub tabelele de calcul consum curent de la TVCI')
 ''' instructiunea de mai jos scrie elementele de sub tabelele de calcul consum curent de la TVCI'''
 # variabila dict_TVCI_calcule_UPS = calcule_UPS_TVCI() contine o lista de dictionare
 # functia de scriere a variabilelor in word ia ca argument valori in urmatorul mod document.merge(var1 = 'text1', var2 = 'text2', etc)
@@ -97,7 +98,8 @@ for i in range(len(dict_TVCI_tabel_consum_electric)):
 for i in range(len(dict_TVCI_calcule_UPS)):
     word_document.merge(**dict_TVCI_calcule_UPS[i])
 
-''' instructiunea de mai jos scrie puterea aparenta a UPS-urilor(VA) in calculele pt capacitatea UPS-urilor  TVCI'''
+print('scrie puterea aparenta a UPS-urilor(VA) in calculele pt capacitatea UPS-urilor TVCI')
+''' instructiunea de mai jos scrie puterea aparenta a UPS-urilor(VA) in calculele pt capacitatea UPS-urilor TVCI'''
 # variabila dict_TVCI_capacitate_UPS = putere_aparenta_UPS_calculate() contine o lista de dictionare
 # functia de scriere a variabilelor in word ia ca argument valori in urmatorul mod document.merge(var1 = 'text1', var2 = 'text2', etc)
 # pentru ca am o lista de dictionare, iterez lista si prin (**dict_TVCI_capacitate_UPS[i]) convertesc dictionarul
@@ -105,6 +107,7 @@ for i in range(len(dict_TVCI_calcule_UPS)):
 for i in range(len(dict_TVCI_capacitate_UPS)):
     word_document.merge(**dict_TVCI_capacitate_UPS[i])
 
+print('scrie elementele de sub calculele capacitatii HDD-urilor pt fiecare HDD')
 ''' instructiunea de mai jos scrie elementele de sub calculele capacitatii HDD-urilor pt fiecare HDD'''
 # variabila dict_TVCI_calcule_HDD = calcule_HDD_TVCI() contine o lista de dictionare
 # functia de scriere a variabilelor in word ia ca argument valori in urmatorul mod document.merge(var1 = 'text1', var2 = 'text2', etc)
@@ -112,6 +115,12 @@ for i in range(len(dict_TVCI_capacitate_UPS)):
 # in valori de tipul (var1 = 'text1', var2 = 'text2', etc) astfel incat sa poata fi scrise in fisierul word.
 for i in range(len(dict_TVCI_calcule_HDD)):
     word_document.merge(**dict_TVCI_calcule_HDD[i])
+
+
+'''Importare module de test'''
+from Test_upload_many_lines import variabile_caracteristic_tehnice
+dict_printare_caract_tehnice = variabile_caracteristic_tehnice()
+
 
 ''' instructiunea de mai jos scrie caracteristicile tehnice ale echipamentelor de la efractie, TVCI'''
 for i in range(len(dict_printare_caract_tehnice)):
@@ -139,7 +148,6 @@ word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe Wo
 
 
 
-#!!!!de dublat simbolul unei camere/element de la TVCI sau efractie si de facut o verificare astfel incat sa imi afiseze eroare cum ca un element este dublat
 
 # de verificat de ce nu este activa linia 19 din acest modul from TVCI_lista_echipamente import TVCI_equipment_qty_table
 #de verificat codul pe proiecte deja intocmite si de vazut daca sunt scapari
@@ -149,3 +157,6 @@ word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe Wo
 
 #!!!FFF important, de retinut ca modulul TVCI_tbl_consum_alege_UPS sa ruleze inainte de a rula
 # modulul TVCI_lista_echipamente, altfel UPS-urile nu vor fi scrise in lista de cantitati
+
+#06.07
+#de verificat de ce nu mai imi adauga UPS-ul in lista de cantitati de la TVCI

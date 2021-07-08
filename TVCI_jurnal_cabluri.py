@@ -41,7 +41,7 @@ def jurnal_cabluri_TVCI(video_balun_code, cable_type_video):
 
     # cream seria prin
     def prin_video_map(x):
-        #print(df_TVCI_equipments_with_attributes['Tehnologie'])
+        #jurnal_cabluri_TVCIprint(df_TVCI_equipments_with_attributes['Tehnologie'])
         if df_TVCI_equipments_with_attributes.loc[x, ['Tehnologie']][0] == 'ANALOG':
             if (('utp') or ('ftp')) in cable_type_video.lower():
                 return (video_balun_code)

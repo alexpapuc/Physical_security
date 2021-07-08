@@ -22,6 +22,11 @@ df_pwr_supply_calculation.rename(columns={"CONSUM_VEGHE": "TOTAL CONSUM VEGHE", 
 lst = []
 lst_var_SA =[]
 
+#creez o lista goala in care stochez codurile echipamentelor utilizate in modulul efractie
+#aceste coduri vor fi utilizate in modulul antiefractie_TVCI_caract_tehnice pt a scrie caract tehnice in fisierul word
+lst_coduri_echip_pt_fise_tehnice = []
+
+
 # pentru calculul consumurilor pe sursele de alimentare este nevoie sa extrag denumirile tuturor surselor de alimentare din sistem
 # aceste denumiri de surse sunt introduse in lista list_pwr_supply_labels si utilizate ulterior pentru calcule, denumire sheet-uri fisier exportat
 read_pwr_supply_labels = df_intrussion_dwg["INDEX"]
@@ -417,6 +422,7 @@ def creare_tabel_lista_cantitati():
     df_final_qty_table_for_word = df_final_qty_table_for_word[
         ['nr_crt_cantitati', 'Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor',
          'Document insotior']]
+
     df_final_qty_table_for_word = df_final_qty_table_for_word.astype(str)
     df_final_qty_table_for_word.rename(columns={'nr_crt_cantitati': 'efr_cantitati_nr_crt',
                                                 'Denumire_element': 'efr_cantitati_denumire_element',
@@ -426,18 +432,83 @@ def creare_tabel_lista_cantitati():
                                                 'Furnizor': 'efr_cantitati_furnizor',
                                                 'Document insotior': 'efr_cantitati_CE'}, inplace=True)
     dict_df_final_qty_table_for_word = df_final_qty_table_for_word.to_dict('records')
-    print(dict_df_final_qty_table_for_word)
+    #print(dict_df_final_qty_table_for_word)
+    #print(lst_coduri_echip_pt_fise_tehnice)
+
     return dict_df_final_qty_table_for_word
+
+# def preluare_coduri_echip_din_lista_cantitati_efractie():
+#     #apelam functia calcul_capacitate_acumulatoare() pentru a ne returna lista de dictionare ce contine acumulatoarele calculate
+#     df_acumulatoare_calculate = pd.DataFrame(calcul_capacitate_acumulatoare())
+#     #la df_acumulatoare_calculate adaugam continutul data frame-ului df_read_zonare
+#     df_acumulatoare_calculate = df_acumulatoare_calculate.append(df_read_zonare)
+#     #cream un nou dataframe ce grupeaza elementele in functie de cod echipament si numara cate elemente de acelasi tip avem
+#     qty_table = df_acumulatoare_calculate.groupby("COD_ECHIPAMENT")["CANTITATE"].count()
+#     final_qty_table = pd.merge(qty_table, df_db, on="COD_ECHIPAMENT")
+#     # print(final_qty_table["COD_ECHIPAMENT"])
+#     # Pentru ca in lista de cantitati apar si alarma de incendiu, Tamperul, le-am bagat intr-o lista dupa care se face stergerea lor din tabel
+#     list_value_need_dropped = ['Alarma incendiu', 'Tamper']
+#     final_qty_table = final_qty_table.drop(
+#         final_qty_table[final_qty_table.COD_ECHIPAMENT.isin(list_value_need_dropped)].index.tolist())
+#
+#     # creez dataframe-ul pt a afisa ce coloane ma intereseaza si fac filtrarea in functie de coloana 'Nr. Crt'
+#     # pt ca nu vreau sa afisez coloana 'Nr. Crt', fac atribuirea df-ului la el insusi dar fara coloana 'Nr. Crt'
+#     final_qty_table[
+#         ['Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor', 'Document insotior', 'Nr. Crt']]
+#     final_qty_table = pd.DataFrame(final_qty_table[
+#                                        ['Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor',
+#                                         'Document insotior', 'Nr. Crt']]).sort_values(by='Nr. Crt', ascending=True)
+#
+#     final_qty_table = final_qty_table[
+#         ['Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor',
+#          'Document insotior']]
+#
+#     df_final_qty_table_for_word = final_qty_table[
+#         ['Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor',
+#          'Document insotior']]
+#
+#     final_qty_table.reset_index(drop=True, inplace=True)
+#     final_qty_table.index = final_qty_table.index + 1
+#     # sortez valorile afisate in functie de 'CANTITATE' si 'COD_ECHIPAMENT'
+#     # final_qty_table = final_qty_table.sort_values(by=['Denumire_element', 'CANTITATE'], ascending=False)
+#     final_qty_table.rename(columns={'COD_ECHIPAMENT': 'Cod echipament', 'CANTITATE': 'Cantitate'}, inplace=True)
+#     # print(final_qty_table)
+#     # final_qty_table.to_excel(writer, sheet_name='Cantitati echip', index=True)
+#
+#     df_final_qty_table_for_word.reset_index(drop=True, inplace=True)
+#     df_final_qty_table_for_word.index = df_final_qty_table_for_word.index + 1
+#     df_final_qty_table_for_word['nr_crt_cantitati'] = df_final_qty_table_for_word.index
+#     df_final_qty_table_for_word = df_final_qty_table_for_word[
+#         ['nr_crt_cantitati', 'Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE', 'Producator', 'Furnizor',
+#          'Document insotior']]
+#     #creare lista cu codurile de echipamente din lista de cantitati, ce va fi folosita pentru a fi returnata de
+#     # functia efr_coduri_echip_pt_fise_tehnice()
+#     lista_coduri_echipamente = list(df_final_qty_table_for_word['COD_ECHIPAMENT'])
+#     for item in lista_coduri_echipamente:
+#         lst_coduri_echip_pt_fise_tehnice.append(item)
+#
+#     # df_final_qty_table_for_word = df_final_qty_table_for_word.astype(str)
+#     # df_final_qty_table_for_word.rename(columns={'nr_crt_cantitati': 'efr_cantitati_nr_crt',
+#     #                                             'Denumire_element': 'efr_cantitati_denumire_element',
+#     #                                             'COD_ECHIPAMENT': 'efr_cantitati_tip_element',
+#     #                                             'CANTITATE': 'efr_cantitati_cantitate',
+#     #                                             'Producator': 'efr_cantitati_producator',
+#     #                                             'Furnizor': 'efr_cantitati_furnizor',
+#     #                                             'Document insotior': 'efr_cantitati_CE'}, inplace=True)
+#     # dict_df_final_qty_table_for_word = df_final_qty_table_for_word.to_dict('records')
+#     #print(dict_df_final_qty_table_for_word)
+#     #print(lst_coduri_echip_pt_fise_tehnice)
+#
+#     return lst_coduri_echip_pt_fise_tehnice
+
 
 def denumire_sursa_antiefractie(arg_SA):
     dict_sursa_alimentare = {'efr_consum_SA': arg_SA}
     dict_sursa_alimentare_copy = dict_sursa_alimentare.copy()
     list_of_dict_sursa_alimentare = []
     list_of_dict_sursa_alimentare.append(dict_sursa_alimentare_copy)
-    print(list_of_dict_sursa_alimentare)
+    #print(list_of_dict_sursa_alimentare)
     return list_of_dict_sursa_alimentare
-
-
 
 # def creare_tabel_zonare():
 #     # global df_intrussion_dwg
@@ -819,7 +890,7 @@ def tabele_consum():
     #lista_echipamente_tabele_consum = list(map(dict, chain.from_iterable(lst)))
     lista_echipamente_tabele_consum = lst
     #print(lst)
-    print(lista_echipamente_tabele_consum)
+    #print(lista_echipamente_tabele_consum)
     return lista_echipamente_tabele_consum
 
 #functia var_surse_alim() aduce lista de dictionare lst_var_SA, o salveaza in variabila lista_var_surse_efr si
@@ -828,14 +899,24 @@ def var_surse_alim():
     #lista_echipamente_tabele_consum = list(map(dict, chain.from_iterable(lst)))
     lista_var_surse_efr = lst_var_SA
     #print(lst)
-    print(lista_var_surse_efr)
+    #print(lista_var_surse_efr)
     return lista_var_surse_efr
+
+# def efr_coduri_echip_pt_fise_tehnice():
+#     lista_coduri_echip_pt_fise_tehnice = lst_coduri_echip_pt_fise_tehnice
+#     #print(lista_coduri_echip_pt_fise_tehnice)
+#     return lista_coduri_echip_pt_fise_tehnice
+
+
+
 
 
 if __name__ == '__main__':
     creare_tabel_lista_cantitati()
+    #preluare_coduri_echip_din_lista_cantitati_efractie()
     tabele_consum()
     var_surse_alim()
+    #efr_coduri_echip_pt_fise_tehnice()
 # creare_tabel_zonare()
 
 # writer.save()
