@@ -1,4 +1,5 @@
 import pandas as pd
+import sys
 
 df_db_TVCI = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_TVCI.xlsx')
 df_TVCI_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\TVCI.txt', delimiter="\t")
@@ -20,6 +21,32 @@ def TVCI_camera_labels():
                                             filt, ['SIMBOL_ECHIPAMENT', 'Denumire_element', 'COD_ECHIPAMENT',
                                                    'Modul_de_programare', 'SPATIUL_SUPRAVEGHEAT']])
     df_keep_only_cameras.sort_values(by='SIMBOL_ECHIPAMENT', ascending=True, inplace=True)
+
+    # verificare daca fiecare camera are completat denumirea zonei supravegheate
+    # daca sunt camere ce nu au denumirea completata, se vor afisa acele camere si se va opri executia
+    df_verificare_sp_supravegheat = pd.DataFrame(df_keep_only_cameras[['SIMBOL_ECHIPAMENT', 'SPATIUL_SUPRAVEGHEAT']])
+    #print(df_verificare_sp_supravegheat)
+    filtru_element_fara_denumire_z_protejata = df_verificare_sp_supravegheat['SPATIUL_SUPRAVEGHEAT'].isnull()
+    df_elemente_fara_denumire_z_protejata = pd.DataFrame(
+        df_verificare_sp_supravegheat.loc[filtru_element_fara_denumire_z_protejata,
+                                          ['SIMBOL_ECHIPAMENT',
+                                           'SPATIUL_SUPRAVEGHEAT']])
+    # print(df_elemente_fara_denumire_z_protejata)
+    lst_elemente_fara_denumire_z_protejata = list(df_elemente_fara_denumire_z_protejata['SIMBOL_ECHIPAMENT'])
+    if len(lst_elemente_fara_denumire_z_protejata) == 1:
+        print(
+            f'Camera {lst_elemente_fara_denumire_z_protejata} nu are definita zona pe care o supravegeaza. Completeaza'
+            f' campul "SPATIUL_SUPRAVEGHEAT" de la atributul camerei!')
+        sys.exit(4)
+
+    elif len(lst_elemente_fara_denumire_z_protejata) > 1:
+        print(
+            f'Camerele {lst_elemente_fara_denumire_z_protejata} nu au definite zonele pe care le protejeaza. Completeaza'
+            f' campul "SPATIUL_SUPRAVEGHEAT" de la atributul fiecarei camere!')
+        sys.exit(4)
+    else:
+        pass
+
     # resetam indexul si il salvam pt dataframe
     df_keep_only_cameras.reset_index(drop=True, inplace=True)
     df_keep_only_cameras.index = df_keep_only_cameras.index + 1

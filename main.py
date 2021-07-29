@@ -49,6 +49,7 @@ print(word_document.get_merge_fields())
 
 
 print('scrie tabele cantitati, zonare, jurnal efr si TVCI')
+
 ''' instructiunea de mai jos scrie tabelele: lista cantitati, zonare, jurnal cabluri  de la antiefractie, TVCI'''
 #pt a scrie cu succes in tabelul din word folosim ca si cheie, denumirea variabilei primei coloane din stanga a
 #tabelului din word(vezi ex de mai jos)
@@ -119,28 +120,18 @@ for i in range(len(dict_TVCI_calcule_HDD)):
 
 '''Importare module de test'''
 from Test_upload_many_lines import variabile_caracteristic_tehnice
+from TVCI_caracteristici_tehnice import variabile_caracteristici_tehnice_TVCI
+
 dict_printare_caract_tehnice = variabile_caracteristic_tehnice()
+dict_printare_caract_tehnice_TVCI = variabile_caracteristici_tehnice_TVCI()
 
-
-''' instructiunea de mai jos scrie caracteristicile tehnice ale echipamentelor de la efractie, TVCI'''
+''' instructiunea de mai jos scrie caracteristicile tehnice ale echipamentelor de la efractie'''
 for i in range(len(dict_printare_caract_tehnice)):
     word_document.merge(**dict_printare_caract_tehnice[i])
 
-
-
-#word_document.merge(efr_consum_SA0='CE', efr_i_veghe_SA0='0.5345', efr_i_alarma_SA0='0.8658', efr_acc_SA0 = '18', efr_nr_acc_SA0 = '0.92', efr_acc_rounded_SA0 = '1', efr_consum_SA1 = 'SA1', efr_i_veghe_SA1 = '0.0480', efr_i_alarma_SA1 = '0.0720', efr_acc_SA1 = '7', efr_nr_acc_SA1 = '0.21', efr_acc_rounded_SA1 = '1', efr_consum_SA2 = 'SA2', efr_i_veghe_SA2 = '0.0480', efr_i_alarma_SA2 = '0.0720', efr_acc_SA2 = '7', efr_nr_acc_SA2 = '0.21', efr_acc_rounded_SA2 = '1', efr_consum_SA3 = 'SA3', efr_i_veghe_SA3 = '0.0720', efr_i_alarma_SA3 = '0.1080', efr_acc_SA3 = '7', efr_nr_acc_SA3 = '0.32', efr_acc_rounded_SA3 = '1', efr_consum_SA4 = 'SA4', efr_i_veghe_SA4 = '0.0960', efr_i_alarma_SA4 = '0.1440', efr_acc_SA4 = '7', efr_nr_acc_SA4 = '0.42', efr_acc_rounded_SA4 = '1')
-
-
-
-
-# word_document.merge_templates([{'efr_cantitati_nr_crt': dict_antiefractie_creare_tabel_lista_cantitati,
-#                                 'efr_zonare_nr_crt': dict_antiefractie_creare_tabel_zonare,
-#                                 'efr_jurnal_nr_crt': dict_antiefractie_creare_tabel_jurnal_cabluri,
-#                                 'efr_consum_nr_crt0': dict_antiefractie_creare_tabel_calcul_acumulator_efractie,
-#                                 }
-#                                ], separator='page_break')
-
-#print(dict_antiefractie_creare_tabel_calcul_acumulator_efractie)
+''' instructiunea de mai jos scrie caracteristicile tehnice ale echipamentelor de la TVCI'''
+for i in range(len(dict_printare_caract_tehnice_TVCI)):
+    word_document.merge(**dict_printare_caract_tehnice_TVCI[i])
 
 
 

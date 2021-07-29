@@ -26,9 +26,10 @@ def verific_echip_inainte_de_calcule():
         print(f' Codurile de echipamente {list_missing_equip_codes} nu se regasesc in baza de date!\
  Adaugati echipamentele in baza de date sau verificati ca la atributele alocate in DWG, codurile au fost scrise corect!')
         sys.exit(1)
-
-
 verific_echip_inainte_de_calcule()
+
+
+
 
 # creez df_TVCI_equipments_with_attributes in care am toate echipamentele din fisierul exportat din autocad combinate cu baza de date
 # pentru toate echipamentele din fisierul df_TVCI_dwg avem si coloanele din baza de date

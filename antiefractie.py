@@ -4,12 +4,17 @@ import xlrd
 from math import ceil
 from itertools import chain
 
-df_db = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_efractie.xlsx')
-df_intrussion_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.txt',
-                                delimiter="\t")
-df_read_zonare = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.txt',
-                             delimiter="\t")
+try:
+    df_db = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_efractie.xlsx')
 
+
+    df_intrussion_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.txt',
+                                    delimiter="\t")
+    df_read_zonare = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.txt',
+                                 delimiter="\t")
+except FileNotFoundError as exception_label:
+    print(f' Fisierul {exception_label} nu se afla in folderul radacina')
+    sys.exit(3)
 # creez data frame df.pwr_supply din df_intrussion_dwg (din tabelul exportat din Autocad), in care afisez coloanele "SURSA_ALIMENTARE", "CONSUM_VEGHE", "CONSUM_ALARMA" , le grupez dupa coloana "SURSA_ALIMENTARE" si le adun .sum()
 df_pwr_supply = df_intrussion_dwg[["INDEX", "CONSUM_VEGHE", "CONSUM_ALARMA"]].groupby(["INDEX"]).sum()
 # creez un nou data frame df_pwr_supply_calculation derivat din df_pwr_supply

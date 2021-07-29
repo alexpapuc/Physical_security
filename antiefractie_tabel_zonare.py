@@ -1,4 +1,5 @@
 import pandas as pd
+import sys
 df_db = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_efractie.xlsx')
 df_intrussion_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.txt',
                                 delimiter="\t")
@@ -15,6 +16,55 @@ def creare_tabel_zonare():
     # sterg liniile ce nu contin valori pe coloana 'NUMAR_ZONA'
     # toate zonele din sistem vor trebui sa aiba atribuita o zona, altfel(daca nu se completeaza atributul corespunzator zonei in autocad) zona/zonele nu vor aparea in tabelul zonare
     zonare_table = zonare_table.dropna(subset=['NUMAR_ZONA'])
+
+    #verific daca exista zone care nu au completat campul 'DENUMIRE_ZONA_PROTEJATA' din atributul zonei
+    # daca avem denumiri necompletate, afisez eroare si opresc executia
+    df_zonare_efractie = pd.DataFrame(zonare_table[['NUMAR_ZONA', 'Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE',
+                                                    'SIMBOL_ECHIPAMENT', 'TIP_ZONA', 'PARTITIE',
+                                                    'DENUMIRE_ZONA_PROTEJATA', 'Tip cablu']])
+    filtru_zona_fara_denumire_z_protejata = df_zonare_efractie['DENUMIRE_ZONA_PROTEJATA'].isnull()
+    df_zone_fara_denumire_z_protejata = pd.DataFrame(df_zonare_efractie.loc[filtru_zona_fara_denumire_z_protejata,
+                                                                            ['NUMAR_ZONA',
+                                                                             'Denumire_element',
+                                                                             'COD_ECHIPAMENT',
+                                                                             'DENUMIRE_ZONA_PROTEJATA']])
+    # print(df_zone_fara_denumire_z_protejata)
+    lst_zone_fara_denumire_z_protejata = list(df_zone_fara_denumire_z_protejata['NUMAR_ZONA'])
+    if len(lst_zone_fara_denumire_z_protejata) == 1:
+        print(f'Zona {lst_zone_fara_denumire_z_protejata} nu are definita zona pe care o protejeaza. Completeaza'
+              f' campul "DENUMIRE_ZONA_PROTEJATA" de la atributul zonei!')
+        sys.exit(4)
+
+    elif len(lst_zone_fara_denumire_z_protejata) > 1:
+        print(f'Zonele {lst_zone_fara_denumire_z_protejata} nu au definite zonele pe care le protejeaza. Completeaza'
+              f' campul "DENUMIRE_ZONA_PROTEJATA" de la atributul fiecarei zone!')
+        sys.exit(4)
+    else:
+        pass
+
+
+    #verificam daca toate zonele au partitii atribuite. Daca nu au partitii atribuite, afizez zona/zonele pentru care
+    #trebuie adaugate partitii dupa care intrerup executia
+    df_partitii_zone = pd.DataFrame(zonare_table[['NUMAR_ZONA', 'Denumire_element', 'COD_ECHIPAMENT', 'CANTITATE',
+                                               'SIMBOL_ECHIPAMENT', 'TIP_ZONA', 'PARTITIE', 'DENUMIRE_ZONA_PROTEJATA',
+                                               'Tip cablu']])
+    filtru_zona_fara_partitie = df_partitii_zone['PARTITIE'].isnull()
+    df_zone_fara_partitii = pd.DataFrame(df_partitii_zone.loc[filtru_zona_fara_partitie,['NUMAR_ZONA',
+                                                                                     'Denumire_element',
+                                                                                     'COD_ECHIPAMENT',
+                                                                                     'PARTITIE']])
+    #print(df_zone_fara_partitii)
+    lst_zone_fara_partitii = list(df_zone_fara_partitii['NUMAR_ZONA'])
+    if len(lst_zone_fara_partitii) == 1:
+        print(f'Zona {lst_zone_fara_partitii} nu are partitie alocata')
+        sys.exit(4)
+
+    elif len(lst_zone_fara_partitii) > 1:
+        print(f'Zonele {lst_zone_fara_partitii} nu au partitie alocata')
+        sys.exit(4)
+    else:
+        pass
+
     # verificam daca elementele din fisierul importat din dwg se inseriaza sau nu. verificarea se face prin introducerea zonelor
     # care se repeta in lista seried_zones_list. Ulterior verific daca lista seried_zones_list are vreun element in ea sau nu.
     # daca are, inseamna ca avem zone inseriate si se executa conditiile de sub if
