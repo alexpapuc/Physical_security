@@ -34,6 +34,7 @@ def journal_cables_table(zonare_table):
     # df_cables_journal
     list_of_modules = list(df_list_of_modules['SIMBOL_ECHIPAMENT'])
     list_of_modules.sort()
+    #rint(list_of_modules)
 
     # functia get_nr_of_zones_per_device preia din baza de date numarul de zone de pe placa de baza a
     # fiecarei centrale sau modul de extensie
@@ -139,7 +140,7 @@ def journal_cables_table(zonare_table):
         for p in range(0, get_nr_of_zones_per_device(i)):
             zones.append(count)
             count += 1
-            # print(zones)
+            #print(zones)
             if count2 < no_of_zones:
                 df_cables_journal = df_cables_journal.append(df_only_zones.iloc[count2], ignore_index=True)
                 count2 += 1
@@ -148,7 +149,7 @@ def journal_cables_table(zonare_table):
                 continue
 
         intrussion_modules_and_zones.update({list_of_modules[i]: zones})
-
+        #print(intrussion_modules_and_zones)
     # afisare cheie si valoare pt dictioanr
     # intrussion_modules_and_zones.items()
     # creez o serie din dictionalul intrussion_modules_and_zones
