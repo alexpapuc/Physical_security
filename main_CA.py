@@ -7,6 +7,7 @@ from CA_tabele_consum_energetic import valori_calcule_surse_alim_CA
 from CA_tabel_zone_supravegheate import CA_tabel_zone_supravegheate
 
 
+
 #creare fisier template in care se vor scrie toate valorile rezultate prin rularea modulelor python
 template = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\doc_IP_cam.docx')
 
@@ -14,6 +15,7 @@ template = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\d
 dict_CA_tabele_consum_energetic_CA = valori_tabele_consum_energetic_CA()
 dict_CA_valori_calcule_surse_alim_CA = valori_calcule_surse_alim_CA()
 dict_CA_valori_tabel_zone_supravegheate = CA_tabel_zone_supravegheate()
+
 #print(dict_CA_tabele_consum_energetic_CA)
 
 
@@ -57,7 +59,8 @@ print('scrie rezultate calcule sub tabele CA')
 for i in range(len(dict_CA_valori_calcule_surse_alim_CA)):
     word_document.merge(**dict_CA_valori_calcule_surse_alim_CA[i])
 
-
+from CA_tabel_lista_cantitati import dict_SA_CA
+print(dict_SA_CA)
 
 word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe World Design\\doc_IP_cam_1.docx')
 
@@ -67,3 +70,6 @@ word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe Wo
 # sa o fac o singura variabila iar la conditia else, sa ramana doar fraza - în stare de acţionare: nu există consum pe sursa de alimentare SC4.
 # fara alte variabile
 
+
+# de completat variabilele pentru tabelul lista cantitati in fisierul template word si de
+# creat dictionarul pentru scrierea informatiilor in tabelul word.

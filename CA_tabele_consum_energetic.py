@@ -4,6 +4,7 @@ import sys
 df_db_CA = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_CA.xlsx')
 df_CA_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\CA.txt', delimiter="\t")
 df_CA_dwg_merged_with_db = pd.merge(df_CA_dwg, df_db_CA, on = 'COD_ECHIPAMENT')
+#print(df_CA_dwg_merged_with_db)
 df_SA_CA = pd.DataFrame(df_CA_dwg_merged_with_db[['Nr_Crt',
                                                   'Denumire_element',
                                                   'SURSA_ALIMENTARE',
@@ -11,8 +12,8 @@ df_SA_CA = pd.DataFrame(df_CA_dwg_merged_with_db[['Nr_Crt',
                                                   'COD_ECHIPAMENT',
                                                   'SIMBOL_ECHIPAMENT',
                                                   'CANTITATE',
-                                                  'CONSUM_VEGHE_y',
-                                                  'CONSUM_ALARMA_y']]).dropna()
+                                                  'CONSUM_VEGHE',
+                                                  'CONSUM_ALARMA']]).dropna()
 
 # prin functia check_items() fac verificarea daca un cod de echipament este scris gresit sau nu se afla in
 # vreunul din cele 2 dataframe-uri
@@ -131,14 +132,30 @@ capacitate_acc_SA_CA = int(input(f'Introdu valoarea capacitatii acumulatorului u
 lista_tabele_consum_energetic_CA = []
 lista_valori_calcule_sub_tabele_consum_energetic_CA = []
 
+############
+#creare dictionar pentru acumulatoarele surselor de alimentare de la sistemul de CA
+filt_acc_SA_CA = (df_db_CA['Capacitate_Acumulator'] == capacitate_acc_SA_CA)
+df_acc_SA_CA = pd.DataFrame(df_db_CA.loc[filt_acc_SA_CA, ['Nr_Crt',
+                                                          'Denumire_element',
+                                                          'COD_ECHIPAMENT',
+                                                          'CANTITATE',
+                                                          'Producator',
+                                                          'Furnizor',
+                                                          'Document insotior']])
+dict_acc_SA_CA = df_acc_SA_CA.to_dict('records')
+copy_dict_acc_SA_CA = dict_acc_SA_CA.copy()
+
+# creez o lista goala in care voi stoca acumulatoarele surselor de alimentare ale CA
+lista_dict_acc_SA_CA = []
 
 def tabele_consum_energetic_CA():
+
     for i in range(len(list_pwr_supply_labels)):
         # creez variablia filtru_SA care selecteaza elementele din df_SA_CA ce au pe coloana "SURSA_ALIMENTARE"
         # denumirea sursei din
         # lista de surse de alimentare si au consumul de veghe sau consumul de alarma > 0
         filtru_SA = ((df_SA_CA['SURSA_ALIMENTARE'] == list_pwr_supply_labels[i]) &
-                     ((df_SA_CA["CONSUM_VEGHE_y"] > 0) | (df_SA_CA["CONSUM_ALARMA_y"] > 0)))
+                     ((df_SA_CA["CONSUM_VEGHE"] > 0) | (df_SA_CA["CONSUM_ALARMA"] > 0)))
 
         # creez data frame-ul table_calc_SA din data frame df_SA_CA si fac afisare pe coloana(.loc) pt valorile
         # selectate de variablia filtru_SA
@@ -150,8 +167,8 @@ def tabele_consum_energetic_CA():
                                                               'APARTENENTA_FCA',
                                                               'SIMBOL_ECHIPAMENT',
                                                               'CANTITATE',
-                                                              'CONSUM_VEGHE_y',
-                                                              'CONSUM_ALARMA_y']])
+                                                              'CONSUM_VEGHE',
+                                                              'CONSUM_ALARMA']])
 
         print(table_calc_SA)
 
@@ -163,14 +180,14 @@ def tabele_consum_energetic_CA():
                                                                  'COD_ECHIPAMENT',
                                                                  'Denumire_element',
                                                                  'APARTENENTA_FCA',
-                                                                 'CONSUM_VEGHE_y',
-                                                                 'CONSUM_ALARMA_y'], sort=True).agg(
+                                                                 'CONSUM_VEGHE',
+                                                                 'CONSUM_ALARMA'], sort=True).agg(
             {'SIMBOL_ECHIPAMENT': lambda x: ', '.join(x),
              'CANTITATE': 'sum'}).reset_index()
 
-        df_tabele_calcule_energetice_CA['CONSUM_TOTAL_VEGHE'] = df_tabele_calcule_energetice_CA['CONSUM_VEGHE_y'] * \
+        df_tabele_calcule_energetice_CA['CONSUM_TOTAL_VEGHE'] = df_tabele_calcule_energetice_CA['CONSUM_VEGHE'] * \
                                                                 df_tabele_calcule_energetice_CA['CANTITATE']
-        df_tabele_calcule_energetice_CA['CONSUM_TOTAL_ALARMA'] = df_tabele_calcule_energetice_CA['CONSUM_ALARMA_y'] * \
+        df_tabele_calcule_energetice_CA['CONSUM_TOTAL_ALARMA'] = df_tabele_calcule_energetice_CA['CONSUM_ALARMA'] * \
                                                                  df_tabele_calcule_energetice_CA['CANTITATE']
 
         #creare variabile cu valorile totale de consum veghe, alarma ; variabilele vor fi folosite pt a scrie valorile
@@ -192,8 +209,8 @@ def tabele_consum_energetic_CA():
                                                         'Denumire_element' : 'CA_consum_denumire_element'+str(i),
                                                         'COD_ECHIPAMENT' : 'CA_consum_cod_echipament'+str(i),
                                                         'CANTITATE' : 'CA_consum_cantitate'+str(i),
-                                                        'CONSUM_VEGHE_y' : 'CA_consum_veghe'+str(i),
-                                                        'CONSUM_ALARMA_y' : 'CA_consum_alarma'+str(i),
+                                                        'CONSUM_VEGHE' : 'CA_consum_veghe'+str(i),
+                                                        'CONSUM_ALARMA' : 'CA_consum_alarma'+str(i),
                                                         'CONSUM_TOTAL_VEGHE' : 'CA_consum_total_veghe'+str(i),
                                                         'CONSUM_TOTAL_ALARMA' : 'CA_consum_total_alarma'+str(i)},
                                                inplace=True)
@@ -272,7 +289,11 @@ def tabele_consum_energetic_CA():
     #print(lista_valori_calcule_sub_tabele_consum_energetic_CA)
     #print(lista_tabele_consum_energetic_CA)
 
-    return lista_tabele_consum_energetic_CA, lista_valori_calcule_sub_tabele_consum_energetic_CA
+        # adaugam acumulatorul aferent sursei de alimentare intr-o lista de dictionare ce va fi importata in modulul care
+        # creeaza lista de cantitati pentru subsistemul de control acces
+        lista_dict_acc_SA_CA.append(copy_dict_acc_SA_CA)
+
+    return lista_tabele_consum_energetic_CA, lista_valori_calcule_sub_tabele_consum_energetic_CA, lista_dict_acc_SA_CA
 
 
 def valori_tabele_consum_energetic_CA():
@@ -281,7 +302,7 @@ def valori_tabele_consum_energetic_CA():
     lista_valori_tabele_consum_energetic_CA = lista_tabele_consum_energetic_CA
 
     #print(lista_tabele_consum_energetic_CA)
-    return lista_tabele_consum_energetic_CA
+    return lista_valori_tabele_consum_energetic_CA
 
 #functia var_surse_alim() aduce lista de dictionare lista_valori_calcule_sub_tabele_consum_energetic_CA,
 # o salveaza in variabila lista_valori_calcule_CA si
@@ -293,12 +314,18 @@ def valori_calcule_surse_alim_CA():
     return lista_valori_calcule_CA
 
 
+def dict_acumulatoare_SA_CA():
+    lista_dictionare_SA_CA =  lista_dict_acc_SA_CA
+    return lista_dictionare_SA_CA
+
+
 
 #functia tabele_consum_energetic_CA() o apelez din functia valori_tabele_consum_energetic_CA() pentru a
 # se adauga listele de dictionare(pt tabele si pt calculele de sub tabele) in listele returnate de
 # functiile valori_tabele_consum_energetic_CA() si valori_calcule_surse_alim_CA()
-
 if __name__ == '__main__':
     #tabele_consum_energetic_CA()
     valori_tabele_consum_energetic_CA()
     valori_calcule_surse_alim_CA()
+    dict_acumulatoare_SA_CA()
+
