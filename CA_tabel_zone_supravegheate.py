@@ -11,6 +11,7 @@ def CA_tabel_zone_supravegheate():
                                                                                               'ZONA_SUPRAVEGHEATA']])
     df_tabel_FCA = df_tabel_FCA.sort_values(by='SIMBOL_ECHIPAMENT', ignore_index=True)
     df_tabel_FCA['Denumire_zona_CA'] = 'Uşă acces ' + (df_tabel_FCA['ZONA_SUPRAVEGHEATA']).str.lower()
+    #df_tabel_FCA['Denumire_zona_CA'] = ' '.join(dict.fromkeys(df_tabel_FCA['Denumire_zona_CA'].split()))
     df_tabel_FCA['Tip_zona'] = '24 Ore'
     df_tabel_FCA.index = df_tabel_FCA.index + 1
     df_tabel_FCA['Nr_Crt'] = df_tabel_FCA.index

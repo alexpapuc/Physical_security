@@ -1,6 +1,7 @@
 import pandas as pd
 import sys
 
+
 df_db_CA = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_CA.xlsx')
 df_CA_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\CA.txt', delimiter="\t")
 df_CA_dwg_merged_with_db = pd.merge(df_CA_dwg, df_db_CA, on = 'COD_ECHIPAMENT')

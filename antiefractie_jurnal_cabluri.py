@@ -71,7 +71,7 @@ def journal_cables_table(zonare_table):
     for i in range(0, nr_linii_BUS):
         element = input(f'Introdu elementele componente pentru BUS{i + 1} separate de virgula si fara spatii:')
         element = element.split(',')
-        dictionar.update({i + 1: element})
+        dictionar.update({i + 1 : element})
 
         # df_only_modules = df_only_modules.append
         # print(lista)
