@@ -45,6 +45,10 @@ df_acc_SA_CA = creare_df_acc_SA_CA(lista_dict_acc_surse_alimentare_CA)
 dict_tabel_lista_cantitati_CA = CA_lista_cantitati(df_acc_SA_CA)
 #print(dict_tabel_lista_cantitati_CA)
 
+"""Se creaza dictionarul cu caracteristicile tehnice ale echipamentelor sistemului de CA"""
+dict_caracteristici_tehnice = caracteristici_tehnice_CA(dict_tabel_lista_cantitati_CA)
+
+
 """Se creaza dataframe cu echipamentele ce vor fi incluse in junrnalul de cabluri"""
 df_echip_pt_jurnal_cabluri = creare_df_echip_jurnal_cabluri_CA()
 
@@ -74,6 +78,14 @@ df_jurnal_cabluri_CA = df_jurnal_cabluri(serie_de_la_CA, serie_pana_la_CA, serie
 
 """Creare dictionar cu valorile pt jurnal cabluri control acces"""
 dict_tabel_jurnal_cabluri_CA = creare_dict_jurnal_cabluri_CA(df_jurnal_cabluri_CA)
+
+"""Creare dictionar cu valorile de vor scrie in fisierul word caracteristicile echipamentelor de control acces 
+extrase din lista de cantitati echipamente de control acces"""
+
+
+
+
+
 
 
 #de identificat de ce la E1.2-E1.1-BU1-MCU1 apare MCU1 la pana la in loc de SC1

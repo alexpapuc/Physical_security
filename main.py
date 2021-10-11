@@ -9,6 +9,14 @@ from antiefractie import var_surse_alim
 from antiefractie_tabel_zonare import creare_tabel_zonare
 from antiefractie_jurnal_cabluri import *
 
+"""Inportam functii din modulul CA_functii pentru control acces"""
+from CA_df_variabile import lista_dict_valori_tabele_consum_energetic_CA
+from CA_df_variabile import lista_dict_valori_sub_tabele_consum_energetic_CA
+from CA_df_variabile import dict_tabel_zone_supravegheate_CA
+from CA_df_variabile import dict_tabel_lista_cantitati_CA
+from CA_df_variabile import dict_tabel_jurnal_cabluri_CA
+from CA_df_variabile import dict_caracteristici_tehnice
+
 
 '''Importare module, functii TVCI'''
 from TVCI_Tabel_Amplasament_Camere import TVCI_camera_labels
@@ -31,6 +39,14 @@ dict_antiefractie_creare_tabel_calcul_acumulator_efractie = tabele_consum()
 dict_antiefractie_var_surse_alimentare = var_surse_alim()
 dict_antiefractie_creare_tabel_zonare = creare_tabel_zonare()
 dict_antiefractie_creare_tabel_jurnal_cabluri = journal_cables_table(zonare_table)
+
+'''Crearea de variabile in care stocam dictionarele cu key si val pt tabelele control acces'''
+dict_CA_tabele_consum_energetic_CA = lista_dict_valori_tabele_consum_energetic_CA
+dict_CA_valori_calcule_surse_alim_CA = lista_dict_valori_sub_tabele_consum_energetic_CA
+dict_CA_valori_tabel_zone_supravegheate = dict_tabel_zone_supravegheate_CA
+dict_CA_valori_tabel_lista_cantitati_CA = dict_tabel_lista_cantitati_CA
+dict_valori_tabel_lista_cantitati_CA = dict_tabel_jurnal_cabluri_CA
+dict_CA_valori_caracteristici_tehnice = dict_caracteristici_tehnice
 
 '''Crarea variabile in care stocam dictionarele cu key si val pt tabelele TVCI'''
 dict_TVCI_tabel_amplasare_camere = TVCI_camera_labels()
@@ -134,6 +150,45 @@ for i in range(len(dict_printare_caract_tehnice_TVCI)):
     word_document.merge(**dict_printare_caract_tehnice_TVCI[i])
 
 
+
+
+"""De aici incepe partea de Control Acces"""
+
+print('scrie tabele calcul acumulatoare control acces')
+''' instructiunea de mai jos scrie tabelele de calcul al acumulatoarelor de la control acces'''
+# prin functia tabele consum importam o lista de dictionare
+# variabila dict_antiefractie_creare_tabel_calcul_acumulator_efractie contine o lista de dictionare
+for i in range(len(dict_CA_tabele_consum_energetic_CA)):
+    print(i)
+    word_document.merge_templates([{'CA_consum_nr_crt'+str(i) : dict_CA_tabele_consum_energetic_CA[i]
+                                    },], separator='page_break')
+
+
+print('scrie tabele cantitati, zonare, jurnal CA')
+''' instructiunea de mai jos scrie tabelele: lista cantitati, zonare, jurnal cabluri de la CA'''
+#pt a scrie cu succes in tabelul din word folosim ca si cheie, denumirea variabilei primei coloane din stanga a
+#tabelului din word(vezi ex de mai jos)
+# scriem valorile in tabelele de calcul a capacitatii acumulatoarelor pentru susrsele de alimentare de la antiefractie
+word_document.merge_templates([{'CA_cantitati_nr_crt' : dict_CA_valori_tabel_lista_cantitati_CA,
+                                'CA_zonare_nr_crt': dict_tabel_zone_supravegheate_CA,
+                                'CA_jurnal_nr_crt' : dict_valori_tabel_lista_cantitati_CA,
+                                },
+                               ], separator='page_break')
+
+
+print('scrie rezultate calcule sub tabele CA')
+''' instructiunea de mai jos scrie elementele de sub tabelele de calcul al acumulatoarelor de la CA'''
+# variabila dict_CA_valori_calcule_surse_alim_CA contine o lista de dictionare
+# functia de scriere a variabilelor in word ia ca argument valori in urmatorul mod document.merge(var1 = 'text1', var2 = 'text2', etc)
+# pentru ca am o lista de dictionare, iterez lista si prin (**dict_CA_valori_calcule_surse_alim_CA[i]) convertesc dictionarul
+# in valori de tipul (var1 = 'text1', var2 = 'text2', etc) astfel incat sa poata fi scrise in fisierul word.
+#print(dict_CA_valori_calcule_surse_alim_CA)
+for i in range(len(lista_dict_valori_sub_tabele_consum_energetic_CA)):
+    word_document.merge(**dict_CA_valori_calcule_surse_alim_CA[i])
+
+print('scrie caracteristicile tehnice ale echipamentelor sistemului de CA')
+for i in range(len(dict_CA_valori_caracteristici_tehnice)):
+    word_document.merge(**dict_CA_valori_caracteristici_tehnice[i])
 
 word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe World Design\\doc_IP_cam_1.docx')
 

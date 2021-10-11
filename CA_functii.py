@@ -552,7 +552,28 @@ def CA_lista_cantitati(df_acc_SA_CA):
     dict_df_CA_tabel_cantitati = df_CA_tabel_cantitati.to_dict('records')
     return dict_df_CA_tabel_cantitati
 
+def caracteristici_tehnice_CA(dict_df_CA_tabel_cantitati):
+    #dict_df_CA_tabel_cantitati este o lista de dictionare si o convertesc intr-un dataframe
+    df_lista_cantitati_CA = pd.DataFrame(dict_df_CA_tabel_cantitati)
 
+    # din dataframe introduc intr-o lista coloana cu codurile de echipamente
+    lista_coduri_echipamente_CA= list(df_lista_cantitati_CA['CA_cantitati_tip_element'])
+
+    dict_caract_tehnice_CA = {}
+    lista_dict_caract_tehnice_CA = []
+
+    # verific fiecare cod de echipament in baza de date si pentru fiecare cod extrag de pe coloana caracteristici
+    # tehnice din baza de date informatiile despre echipamentul respectiv, informatii ce vor fi stocate intr-o
+    # lista de dictionare ce vor fi returnate pt a fi utilizate in CA_functii
+    for i in range(len(lista_coduri_echipamente_CA)):
+        filt = df_db_CA["COD_ECHIPAMENT"] == lista_coduri_echipamente_CA[i]
+        df_get_caract_tehnice = pd.DataFrame(df_db_CA.loc[filt, ['COD_ECHIPAMENT', 'Caracteristici tehnice']])
+        caracteristici_tehnice = df_get_caract_tehnice['Caracteristici tehnice'].iloc[0]
+        dict_caract_tehnice_CA.update({'var_CA' + str(i): caracteristici_tehnice})
+        lista_dict_caract_tehnice_CA.append(dict_caract_tehnice_CA)
+    #print(lista_dict_caract_tehnice_CA)
+
+    return lista_dict_caract_tehnice_CA
 
 """
 Pentru creare jurnal cabluri CA trebuie sa identificam echipamentele ce se vor conecta la modulul de control acces
@@ -584,8 +605,8 @@ def creare_df_echip_jurnal_cabluri_CA():
 
 
 def identificare_FCA(df_echip_pt_jurnal_cabluri_CA):
-
-    """Identificam cate filtrele de control acces pe care le avem in componenta sistemului, dupa care le sortam in ordine crescatoare"""
+    """Identificam care sunt filtrele de control acces pe care le avem in componenta sistemului, dupa care
+    le sortam in ordine crescatoare"""
     lista_filtre_CA = list(df_echip_pt_jurnal_cabluri_CA['APARTENENTA_FCA'].dropna())
     lista_FCA = []
     for item in lista_filtre_CA:
@@ -596,7 +617,7 @@ def identificare_FCA(df_echip_pt_jurnal_cabluri_CA):
     return lista_FCA
 
 def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
-    """ Grupam echipamentele in functie de filtrele de control acces de care apartin"""
+    """Grupam echipamentele in functie de filtrele de control acces de care apartin"""
     #def creare_df_pt_fiecare_FCA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
     #df_FCA = df_echip_pt_jurnal_cabluri_CA.groupby(by = 'APARTENENTA_FCA', dropna = True)
     df_FCA = df_echip_pt_jurnal_cabluri_CA.groupby('APARTENENTA_FCA')
@@ -614,7 +635,7 @@ def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
                                      df_FCA.get_group(FCA)['Denumire_element']))
 
         """De aici preiau dictionarul ce contine echipamentele ce apartin fiecarui filtru de control acces"""
-        dict_elemente_FCA
+        print(dict_elemente_FCA)
 
         def get_key(val):
             for key, value in dict_elemente_FCA.items():
@@ -677,6 +698,7 @@ def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
         #print(dict_elemente_FCA)
         #cream o lista cu toate denumirile elementelor componente pentru un filtru de CA dupa care
         lista_denumiri_echipamente_in_FCA = dict_elemente_FCA.values()
+        #print(lista_denumiri_echipamente_in_FCA)
 
         for valoare in lista_denumiri_echipamente_in_FCA:
             #for i in range(len(lista_cuvinte_tinta_echipamente_FCA)):
@@ -720,22 +742,25 @@ def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
                 cheie = get_key(valoare)
                 if cheie not in lista_emg_BU:
                     lista_emg_BU.append(cheie)
+                    #print(lista_emg_BU)
             elif lista_cuvinte_tinta_echipamente_FCA[7] in valoare:
                 cheie = get_key(valoare)
                 cheie_concat = (cheie + '-') + df_echip_pt_jurnal_cabluri_CA.loc[
                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
-                #print(cheie_concat)
+                print(cheie_concat)
                 """cheie_concat este variabila ce stocheaza MCU-BU pt a putea crea in jurnalul de cabluri 
                              E-BU-MCU la SA"""
                 if cheie_concat not in lista_emg_BU:
                     lista_emg_BU.append(cheie_concat)
+                    print(lista_emg_BU)
                 val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'SURSA_ALIMENTARE'].iloc[0]
-                print(val_conectare_la)
+        print(val_conectare_la)
         #print(lista_emg_BU)
         caracter_de_separare = '-'
         lista_emg_BU_cu_caract_separare = caracter_de_separare.join(lista_emg_BU[::-1])
         cheie = lista_emg_BU_cu_caract_separare
+        #print(val_conectare_la)
         dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
         lista_emg_BU.clear()
 
@@ -751,6 +776,7 @@ def serie_de_la_jurnal_cabluri_CA(dict_de_la_pana_la_CA):
 def serie_pana_la_jurnal_cabluri_CA(dict_de_la_pana_la_CA):
     valori_pana_la_jurnal_cabl_CA = dict_de_la_pana_la_CA.values()
     serie_pana_la = pd.Series(valori_pana_la_jurnal_cabl_CA)
+    #print(serie_pana_la)
     return serie_pana_la
 
 
@@ -823,189 +849,6 @@ def creare_dict_jurnal_cabluri_CA(df_jurnal_cabluri_CA):
 
 
 
-
-
-
-
-
-
-
-
-
-
-# print(dict_elemente_FCA)
-# lista_finala_simboluri = []
-# for val in lista_simboluri_jurnal_cabl_CA:
-#     get_key(val)
-
-
-
-
-
-
-
-
-
-# mai intai setam coloana "Denumire_element" ca index astfel incat sa putem folosi .loc
-#df_echip_pt_jurnal_cabluri_CA.index = df_echip_pt_jurnal_cabluri_CA.Denumire_element
-
-#df_FCA = df_echip_pt_jurnal_cabluri_CA.groupby('APARTENENTA_FCA')
-#print(df_FCA)
-#
-# lista_elemente_CA = []
-# lista_emg_BU = []
-# def de_la_echipamente_CA(x,FCAx):
-#     if 'cerere' in x.lower():
-#         return print(df_FCA.get_group(FCAx).loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         #return print(len(x))
-#     elif 'electromagnet' in x.lower():
-#         lista_emg_BU.append(df_FCA.get_group(FCAx).loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#     elif 'urgen' in x.lower():
-#         #print(lista_emg_BU, 'Asta se printeaza inainte de while')
-#         lista_emg_BU.append(df_FCA.get_group(FCAx).loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         while len(lista_emg_BU) > 0:
-#             #print(lista_emg_BU, 'Asta se printeaza din while do')
-#             caracter_de_separare = '-'
-#             caracter_de_separare = caracter_de_separare.join(lista_emg_BU[::-1])
-#             lista_emg_BU.clear() #sterg elementele din lista pentru a nu se suprapune la urmatoarea scriere
-#             return print(caracter_de_separare)
-#             #return print (lista_emg_BU[0])
-#
-#     elif 'cititor' in x.lower():
-#         #print('nu e din cititor')
-#         return print(df_FCA.get_group(FCAx).loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         #return print(df_FCA.get_group(FCAx).loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         #return print(len(x))
-#     elif 'surs' in x.lower():
-#         return print(df_FCA.get_group(FCAx).loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         #return print(len(x))
-
-
-# serie1 = df_FCA.get_group('FCA1')['Denumire_element']
-#
-# serie1 = serie1.map(serie_pana_la_map)
-#
-# for FCA in lista_FCA:
-#     serie1 = df_FCA.get_group(FCA)['Denumire_element'].agg(de_la_echipamente_CA, FCAx = FCA)
-
-
-# def de_la_echipamente_CA(x):
-#     if 'cerere' in x.astype(str).str.lower():
-#         return print(df_echip_pt_jurnal_cabluri_CA.loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         #return print(len(x))
-#     elif 'electromagnet' in x.astype(str).str.lower():
-#         lista_emg_BU.append(df_echip_pt_jurnal_cabluri_CA.loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#     elif 'urgen' in x.astype(str).str.lower():
-#         #print(lista_emg_BU, 'Asta se printeaza inainte de while')
-#         lista_emg_BU.append(df_echip_pt_jurnal_cabluri_CA.loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         while len(lista_emg_BU) > 0:
-#             #print(lista_emg_BU, 'Asta se printeaza din while do')
-#             caracter_de_separare = '-'
-#             caracter_de_separare = caracter_de_separare.join(lista_emg_BU[::-1])
-#             lista_emg_BU.clear() #sterg elementele din lista pentru a nu se suprapune la urmatoarea scriere
-#             return print(caracter_de_separare)
-#             #return print (lista_emg_BU[0])
-#
-#     elif 'cititor' in x.astype(str).str.lower():
-#         #print('nu e don cititor)')
-#         return print(df_echip_pt_jurnal_cabluri_CA.loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         #return print(df_FCA.get_group(FCAx).loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         #return print(len(x))
-#     elif 'surs' in x.astype(str).str.lower():
-#         return print(df_echip_pt_jurnal_cabluri_CA.loc[x, ['SIMBOL_ECHIPAMENT']][0])
-#         #return print(len(x))
-#
-# lista_index = list(df_echip_pt_jurnal_cabluri_CA.index)
-# print(lista_index)
-#
-# for FCA in lista_FCA:
-#      serie1 = df_FCA.get_group('FCA1').agg(de_la_echipamente_CA)
-#
-# print(serie1)
-#print(df_echip_pt_jurnal_cabluri_CA)
-#print(df_echip_pt_jurnal_cabluri_CA.loc['Sursă de alimentare 12V 5.4A', ['SIMBOL_ECHIPAMENT']][0])
-
-#DE GASIT O SOLUTIE PT A AGREGA ECHIPAMENTELE CARE SE DUBLEAZA (ELECTROMAGNETI SAU CITITOARE) INAINTE DE A APLICA
-#FUNCTIA sde_la_echipamente_CA(x,FCAx) PT A CREA SERIA DE LA
-#acum nu functioneaza pt ca am 2 cititoare in FCA1
-
-
-
-
-
-# df_echip_pt_jurnal_cabluri_CA.index = df_echip_pt_jurnal_cabluri_CA.Denumire_element
-# print(df_echip_pt_jurnal_cabluri_CA)
-# print(df_FCA.get_group('FCA1').loc['Buton cerere ieșire', ['SIMBOL_ECHIPAMENT']][0])
-
-
-
-#de vazut cum reusesc sa creez un algoritm care sa identifice BI, cititorul si emg - BU pe care sa le atribui la o serie
-
-
-
-#print(df_FCA.get_group('FCA1')['SIMBOL_ECHIPAMENT'])
-
-# for i in range(len(lista_FCA)):
-#     filt_FCA = df_echip_pt_jurnal_cabluri_CA["APARTENENTA_FCA"] == lista_FCA[i]
-#     if df_echip_pt_jurnal_cabluri_CA.loc[filt_FCA, ['Denumire_element']].str.contains('cerere'):
-#         print(df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'][i])
-#         df_get_number_of_zones_from_db = pd.DataFrame(df_merged_zonare_with_db.loc[
-#                                                           filt, ['NUMAR_ZONA', 'SIMBOL_ECHIPAMENT', 'Tip cablu',
-#                                                                  'Nr_zone', 'Nr_total_zone', 'INDEX']])
-
-
-
-
-
-
-
-
-# print(df_FCA.get_group('FCA1')['Denumire_element'].str.contains('Electromagnet'))
-#df_FCA.agg()
-
-#print(df_FCA['Denumire_element'].apply(lambda x: x.str.contains('lectromagnet')))
-
-# if df_FCA.get_group('FCA1')['Denumire_element'].str.contains('lectromagnet') is True:
-#     print('TRUE')
-# else:
-#     print(df_FCA.get_group('FCA1')['Denumire_element'].str.contains('lectromagnet'))
-
-
-# filter_FCA = df_echip_pt_jurnal_cabluri_CA['APARTENENTA_FCA'] == 'FCA1'
-# print(df_echip_pt_jurnal_cabluri_CA.loc[filter_FCA]['Denumire_element'].str.contains('Electromagnet'))
-
-
-
-# for item in lista_FCA:
-#     filter_FCA = df_echip_pt_jurnal_cabluri_CA['APARTENENTA_FCA'] == item
-#     #print(df_echip_pt_jurnal_cabluri_CA.loc[filter_FCA])
-#     if df_echip_pt_jurnal_cabluri_CA.loc[filter_FCA]['Denumire_element'].str.contains('blocare') is False:
-#         print('ELECTROMAGNET')
-#     else:
-#         print('Nu este')
-#
-
-
-
-
-# for item in lista_FCA:
-#     filter_FCA = df_echip_pt_jurnal_cabluri_CA['APARTENENTA_FCA'].str.contains(item)
-
-# def pana_la_CA(x):
-#     #setez coloana SIMBOL_ECHIPAMENT ca index
-#     df_echip_pt_jurnal_cabluri_CA.index = df_echip_pt_jurnal_cabluri_CA.SIMBOL_ECHIPAMENT
-#
-#     if (df_echip_pt_jurnal_cabluri_CA.loc[x, ['Denumire_element']][0] == 'Sursă de alimentare 12V 5.4A'):
-#         return print(df_echip_pt_jurnal_cabluri_CA.loc[x, ['CONECTARE_LA']][0])
-#
-#     elif df_echip_pt_jurnal_cabluri_CA.loc[x, ['Denumire_element']][0] == 'Cititor de proximitate':
-#         return print(df_echip_pt_jurnal_cabluri_CA.loc[x, ['CONECTARE_LA']][0])
-#
-#     elif df_echip_pt_jurnal_cabluri_CA.loc[x, ['Denumire_element']][0] == 'Buton cerere ieșire':
-#         return print(df_echip_pt_jurnal_cabluri_CA.loc[x, ['CONECTARE_LA']][0])
-#
-# for item in lista_FCA:
-#     serie_pana_la_CA = df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'].map(pana_la_CA)
 
 
 

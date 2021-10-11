@@ -10,18 +10,19 @@ from CA_df_variabile import lista_dict_valori_sub_tabele_consum_energetic_CA
 from CA_df_variabile import dict_tabel_zone_supravegheate_CA
 from CA_df_variabile import dict_tabel_lista_cantitati_CA
 from CA_df_variabile import dict_tabel_jurnal_cabluri_CA
+from CA_df_variabile import dict_caracteristici_tehnice
 
 #creare fisier template in care se vor scrie toate valorile rezultate prin rularea modulelor python
 template = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\doc_IP_cam.docx')
 
-'''Crerea variabile in care stocam dictionarele cu key si val pt tabelele control acces'''
+'''Crearea de variabile in care stocam dictionarele cu key si val pt tabelele control acces'''
 
 dict_CA_tabele_consum_energetic_CA = lista_dict_valori_tabele_consum_energetic_CA
 dict_CA_valori_calcule_surse_alim_CA = lista_dict_valori_sub_tabele_consum_energetic_CA
 dict_CA_valori_tabel_zone_supravegheate = dict_tabel_zone_supravegheate_CA
 dict_CA_valori_tabel_lista_cantitati_CA = dict_tabel_lista_cantitati_CA
 dict_valori_tabel_lista_cantitati_CA = dict_tabel_jurnal_cabluri_CA
-#print(dict_CA_tabele_consum_energetic_CA)
+dict_CA_valori_caracteristici_tehnice = dict_caracteristici_tehnice
 
 
 '''Citim fisierul template'''
@@ -61,6 +62,10 @@ print('scrie rezultate calcule sub tabele CA')
 for i in range(len(lista_dict_valori_sub_tabele_consum_energetic_CA)):
     word_document.merge(**dict_CA_valori_calcule_surse_alim_CA[i])
 
+print('scrie caracteristicile tehnice ale echipamentelor sistemului de CA')
+for i in range(len(dict_CA_valori_caracteristici_tehnice)):
+    word_document.merge(**dict_CA_valori_caracteristici_tehnice[i])
+
 
 
 word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe World Design\\doc_IP_cam_1.docx')
@@ -72,6 +77,6 @@ word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe Wo
 # # fara alte variabile
 
 
-# de creat functia pentru jurnalul de cabluri cu variabile pentru word
+#de sters coloanele cantitate, tensiune veghe, tensiune alarma din simbolurile de CA
 
 
