@@ -77,6 +77,14 @@ word_document.write('C:\\Users\\alexa\\Desktop\\Proiecte PyCharm\\Pandas Safe Wo
 # # fara alte variabile
 
 
-#de sters coloanele cantitate, tensiune veghe, tensiune alarma din simbolurile de CA
+#de creat o functie astfel incat sa se faca calculul HDD-urilor in functie de rezolutia pe care o doresc eu
+# si de creat o variabila pt numarul de ore de inregistrare/camera
 
+# de remediat functia jurnalului de cabluri de la CA a.i sa se afiseze corect sursele la care se conecteaza MCA-urile
 
+# de creat variabile pentru efractie astfel incat totalul de la tabelele de calcul acc sa se afiseze direct in celula corespunzatoare
+
+# de creat variabile pentru calcul consum total TVCI astfel incat totalul de la tabelele de calcul UPS sa se afiseze direct in celula corespunzatoare
+
+##############Rezolvat
+# de creat un modul prin care sa fac selectia fisierelor pe care doresc sa le scriu - Profi, Carrefour, etc

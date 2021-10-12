@@ -1,6 +1,8 @@
 from __future__ import print_function
 from mailmerge import MailMerge
 import pandas as pd
+"""Import Modul_Templates_Word_Doc"""
+from Modul_Templates_Word_Doc import *
 
 '''Importare module, functii antiefractie'''
 from antiefractie import tabele_consum
@@ -31,9 +33,11 @@ from TVCI_calcul_capacit_HDD import calcule_HDD_TVCI
 
 
 #creare fisier template in care se vor scrie toate valorile rezultate prin rularea modulelor python
-template = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\doc_IP_cam.docx')
+#template = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\doc_IP_cam.docx')
+template = selecteaza_fisier()
 
-'''Crarea variabile in care stocam dictionarele cu key si val pt tabelele antiefractie'''
+
+'''Crearea de variabile in care stocam dictionarele cu key si val pt tabelele antiefractie'''
 dict_antiefractie_creare_tabel_lista_cantitati = creare_tabel_lista_cantitati()
 dict_antiefractie_creare_tabel_calcul_acumulator_efractie = tabele_consum()
 dict_antiefractie_var_surse_alimentare = var_surse_alim()
