@@ -10,6 +10,8 @@ temp21 = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\\'
             'Pandas Docx Merge Safe World Design\Word_Doc_Templates\Templ21_Profi_IP_CE 2FCA.docx')
 temp22 = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\\'
             'Pandas Docx Merge Safe World Design\Word_Doc_Templates\Templ22_Profi_IP_2SA_3UPS_4DVR.docx')
+temp99 = (r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\\'
+            'Pandas Docx Merge Safe World Design\Word_Doc_Templates\Templ99_ 8SA 12SC 3UPS 4DVR.docx')
 
 
 dict_denumiri_fisiere_template = {
@@ -18,7 +20,8 @@ dict_denumiri_fisiere_template = {
     "3" : temp12,
     "4" : temp20,
     "5" : temp21,
-    "6" : temp22
+    "6" : temp22,
+    "9" : temp99
 }
 
 def fisiere_template():

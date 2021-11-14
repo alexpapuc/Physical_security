@@ -616,157 +616,280 @@ def identificare_FCA(df_echip_pt_jurnal_cabluri_CA):
     #print(lista_FCA)
     return lista_FCA
 
+# def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
+#     """Grupam echipamentele in functie de filtrele de control acces de care apartin"""
+#     #def creare_df_pt_fiecare_FCA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
+#     #df_FCA = df_echip_pt_jurnal_cabluri_CA.groupby(by = 'APARTENENTA_FCA', dropna = True)
+#     df_FCA = df_echip_pt_jurnal_cabluri_CA.groupby('APARTENENTA_FCA')
+#     print('aici printez df_FCA', list(df_FCA))
+#     """am creat un nou dictionar dict_de_la_pana_la_CA in care vom stoca si ordona toate elementele ce se vor scrie
+#     in jurnalul de cabluri"""
+#     dict_de_la_pana_la_CA = {}
+#     lista_emg_BU = []
+#
+#     for FCA in lista_FCA:
+#         """selectez din df_FCA doar elementele care apartin FCA1, FCA2, etc """
+#         #df_FCA.get_group(FCA)
+#         #trebuie sa fac o agregare oe df_FCA.get astfel incat elementele care se inseriaza sa le concatenez si sa am
+#         # CM1.2-CM1.1 pt contact magnetic
+#         # E1.2-E1.1 pt electromagnet
+#         # dupa caoncatenare, trebuie sa fac un altgoritm in care:
+#         # - identific modulul de CA si adaug o inie suplimentara(serie/dictionar) pt MCU1 se alimenteaza din SC1
+#         # - identific cm-urile si le scriu sub forma CM1.2-CM1.1 se conecteaza la MCU1
+#         # - identific emg-urile si le scriu sub forma E1.2-E1.1-Bu1-MCU1  se conecteaza la SC1
+#
+#
+#
+#         """creez un dictionar cu simbolurile de echipamente ca si chei si denumirile de echip ca valori """
+#         dict_elemente_FCA = dict(zip(df_FCA.get_group(FCA)['SIMBOL_ECHIPAMENT'],
+#                                      df_FCA.get_group(FCA)['Denumire_element']))
+#
+#         """De aici preiau dictionarul ce contine echipamentele ce apartin fiecarui filtru de control acces"""
+#         #print('Aici este dict cu fiecare grup de FCA', dict_elemente_FCA)
+#
+#         def get_key(val):
+#             for key, value in dict_elemente_FCA.items():
+#                 if val == value:
+#                     return key
+#             return print("key doesn't exist")
+#
+#         """Aici sunt elementele in baza carora se face cautarea echipamentelor ce apartin fiecarui filtru de CA"""
+#         lista_cuvinte_tinta_echipamente_FCA = ['aliment',
+#                                                'odul',
+#                                                'ititor',
+#                                                'erere',
+#                                                'ontact',
+#                                                'elector',
+#                                                'lectromagnet',
+#                                                'urgen',
+#                                                'ala']
+#         # #dictionarul dict ar trebui updatat cu valorile din dataframe-ul df_FCA.get_group('FCA1') grupat in functie de FCA
+#         # dict_elemente_FCA = {'SC1':'Sursă de alimentare 12V 5.4A',
+#         #                      'R1.1':'Cititor de proximitate',
+#         #                      'R1.2':'Cititor de proximitate',
+#         #                      'BI1':'Buton cerere ieșire',
+#         #                      'BU1':'Buton de ieșire urgență',
+#         #                      'E1':'Electromagnet blocare uși control acces',
+#         #                      'E2':'Electromagnet blocare uși control acces'}
+#
+#         """Pentru ca in valorile dictionarului dict_elemente_FCA apar valori care se repeta(denumirea
+#         electromagnetilor, sau denumirea cititoarelor - atunci cand avem mai multe pe acelasi FCA), am utilizat
+#         functiile de mai jos pentru
+#         - gasire valori dublate in dictionarul dict_elemente_FCA;
+#         - adaugarea unui caracter la fiecare valoare dublata astfel incat sa o fac unica in dictionar
+#         - updatarea dictionarului cu noile valori"""
+#         # finding duplicate values
+#         # from dictionary using set
+#         rev_dict = {}
+#         for key, value in dict_elemente_FCA.items():
+#             rev_dict.setdefault(value, set()).add(key)
+#
+#         #result = filter(lambda x: len(x)>1, rev_dict.values())
+#         result = set(chain.from_iterable(
+#                  values for key, values in rev_dict.items()
+#                  if len(values) > 1))
+#         lista_elemente_dublate = list(result)
+#
+#         #adaugarea unui caracter la fiecare valoare dublata astfel incat sa o fac unica in dictionar si sa se
+#         # poata face potrivirea cuvantului cheie cu toate valorile din dictionar. Daca nu faceam acest arificiu, atunci
+#         # cand aveam 2 cititoare, tot timpul potrivirea se oprea la prima valoare a primului cititor
+#         for i in range(len(lista_elemente_dublate)):
+#             for key, value in dict_elemente_FCA.items():
+#                 if lista_elemente_dublate[i] == key:
+#                     dict_elemente_FCA.update({key : value + str(i)})
+#                     #print(lista_elemente_dublate[i])
+#                 else:
+#                     pass
+#
+#         """Trebuie avut in vedere ca aici dict_elemente_FCA va avea noi valori fata de cele initiale, asadar,
+#         de aici vom extrage lista ce contine valorile dictionarului dict_elemente_FCA.
+#         In aceste valori vom cauta cuvintele cheie, astfel incat sa aflam elementele(cititoare, emg, bu, etc) pe care
+#         le vom ordona in jurnalul de cabluri"""
+#         print("Acesta este dictionarul cu elementele de JC", dict_elemente_FCA)
+#         #cream o lista cu toate denumirile elementelor componente pentru un filtru de CA dupa care
+#         lista_denumiri_echipamente_in_FCA = dict_elemente_FCA.values()
+#         #print(lista_denumiri_echipamente_in_FCA)
+#
+#         for valoare in lista_denumiri_echipamente_in_FCA:
+#             #for i in range(len(lista_cuvinte_tinta_echipamente_FCA)):
+#             if lista_cuvinte_tinta_echipamente_FCA[0] in valoare:
+#                 cheie = get_key(valoare)
+#                 #print(cheie)
+#                 val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
+#                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
+#                 dict_de_la_pana_la_CA.update({cheie : val_conectare_la})
+#             elif lista_cuvinte_tinta_echipamente_FCA[1] in valoare:
+#                 cheie = get_key(valoare)
+#                 #print(cheie)
+#                 val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
+#                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'SURSA_ALIMENTARE'].iloc[0]
+#                 dict_de_la_pana_la_CA.update({cheie : val_conectare_la})
+#             elif lista_cuvinte_tinta_echipamente_FCA[2] in valoare:
+#                 cheie = get_key(valoare)
+#                 #print(cheie)
+#                 val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
+#                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
+#                 dict_de_la_pana_la_CA.update({cheie : val_conectare_la})
+#             elif lista_cuvinte_tinta_echipamente_FCA[3] in valoare:
+#                 cheie = get_key(valoare)
+#                 # print(cheie)
+#                 val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
+#                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
+#                 dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
+#             elif lista_cuvinte_tinta_echipamente_FCA[4] in valoare:
+#                 cheie = get_key(valoare)
+#                 # print(cheie)
+#                 val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
+#                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
+#                 dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
+#             elif lista_cuvinte_tinta_echipamente_FCA[5] in valoare:
+#                 cheie = get_key(valoare)
+#                 # print(cheie)
+#                 val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
+#                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
+#                 dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
+#             elif lista_cuvinte_tinta_echipamente_FCA[6] in valoare:
+#                 cheie = get_key(valoare)
+#                 if cheie not in lista_emg_BU:
+#                     lista_emg_BU.append(cheie)
+#                     #print(lista_emg_BU)
+#             elif lista_cuvinte_tinta_echipamente_FCA[7] in valoare:
+#                 cheie = get_key(valoare)
+#                 cheie_concat = (cheie + '-') + df_echip_pt_jurnal_cabluri_CA.loc[
+#                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
+#                 print(cheie_concat)
+#                 """cheie_concat este variabila ce stocheaza MCU-BU pt a putea crea in jurnalul de cabluri
+#                              E-BU-MCU la SA"""
+#                 if cheie_concat not in lista_emg_BU:
+#                     lista_emg_BU.append(cheie_concat)
+#                     print(lista_emg_BU)
+#                 val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
+#                     df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'SURSA_ALIMENTARE'].iloc[0]
+#         print(val_conectare_la)
+#         #print(lista_emg_BU)
+#         caracter_de_separare = '-'
+#         lista_emg_BU_cu_caract_separare = caracter_de_separare.join(lista_emg_BU[::-1])
+#         cheie = lista_emg_BU_cu_caract_separare
+#         #print(val_conectare_la)
+#         dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
+#         lista_emg_BU.clear()
+#
+#     print(dict_de_la_pana_la_CA)
+#     #print(lista_emg_BU)
+#     return dict_de_la_pana_la_CA
+
 def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
+    dict_coresp_pt_toate_elem = dict(zip(df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'], df_echip_pt_jurnal_cabluri_CA['CONECTARE_LA']))
+    print(dict_coresp_pt_toate_elem )
     """Grupam echipamentele in functie de filtrele de control acces de care apartin"""
     #def creare_df_pt_fiecare_FCA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
     #df_FCA = df_echip_pt_jurnal_cabluri_CA.groupby(by = 'APARTENENTA_FCA', dropna = True)
     df_FCA = df_echip_pt_jurnal_cabluri_CA.groupby('APARTENENTA_FCA')
-
+    #print('aici printez df_FCA', list(df_FCA))
     """am creat un nou dictionar dict_de_la_pana_la_CA in care vom stoca si ordona toate elementele ce se vor scrie 
     in jurnalul de cabluri"""
-    dict_de_la_pana_la_CA = {}
-    lista_emg_BU = []
 
+    dict_de_la_pana_la_CA ={}
     for FCA in lista_FCA:
         """selectez din df_FCA doar elementele care apartin FCA1, FCA2, etc """
-        df_FCA.get_group(FCA)
+
         """creez un dictionar cu simbolurile de echipamente ca si chei si denumirile de echip ca valori """
         dict_elemente_FCA = dict(zip(df_FCA.get_group(FCA)['SIMBOL_ECHIPAMENT'],
                                      df_FCA.get_group(FCA)['Denumire_element']))
 
-        """De aici preiau dictionarul ce contine echipamentele ce apartin fiecarui filtru de control acces"""
-        print(dict_elemente_FCA)
+        dict_corespondenta_elemente_FCA = dict(zip(df_FCA.get_group(FCA)['SIMBOL_ECHIPAMENT'],
+                                     df_FCA.get_group(FCA)['CONECTARE_LA']))
 
-        def get_key(val):
-            for key, value in dict_elemente_FCA.items():
-                if val == value:
-                    return key
-            return print("key doesn't exist")
+        #print(dict_elemente_FCA, dict_corespondenta_elemente_FCA)
 
-        """Aici sunt elementele in baza carora se face cautarea echipamentelor ce apartin fiecarui filtru de CA"""
-        lista_cuvinte_tinta_echipamente_FCA = ['aliment',
-                                               'odul',
-                                               'ititor',
-                                               'erere',
-                                               'ontact',
-                                               'elector',
-                                               'lectromagnet',
+        lista_cuvinte_tinta_echipamente_FCA = ['lectromagnet',
                                                'urgen',
-                                               'ala']
-        # #dictionarul dict ar trebui updatat cu valorile din dataframe-ul df_FCA.get_group('FCA1') grupat in functie de FCA
-        # dict_elemente_FCA = {'SC1':'Sursă de alimentare 12V 5.4A',
-        #                      'R1.1':'Cititor de proximitate',
-        #                      'R1.2':'Cititor de proximitate',
-        #                      'BI1':'Buton cerere ieșire',
-        #                      'BU1':'Buton de ieșire urgență',
-        #                      'E1':'Electromagnet blocare uși control acces',
-        #                      'E2':'Electromagnet blocare uși control acces'}
+                                               'ontact']
 
-        """Pentru ca in valorile dictionarului dict_elemente_FCA apar valori care se repeta(denumirea 
-        electromagnetilor, sau denumirea cititoarelor - atunci cand avem mai multe pe acelasi FCA), am utilizat 
-        functiile de mai jos pentru
-        - gasire valori dublate in dictionarul dict_elemente_FCA;
-        - adaugarea unui caracter la fiecare valoare dublata astfel incat sa o fac unica in dictionar
-        - updatarea dictionarului cu noile valori"""
-        # finding duplicate values
-        # from dictionary using set
-        rev_dict = {}
-        for key, value in dict_elemente_FCA.items():
-            rev_dict.setdefault(value, set()).add(key)
+        dict_denumiri_echipamente = {}
+        lista_emg_bu = []
+        lista_CM = []
+        denumiri_echipamente = set(dict_elemente_FCA.values())
+        #print(denumiri_echipamente)
 
-        #result = filter(lambda x: len(x)>1, rev_dict.values())
-        result = set(chain.from_iterable(
-                 values for key, values in rev_dict.items()
-                 if len(values) > 1))
-        lista_elemente_dublate = list(result)
+        '''stochez valorile dictionarului dict_elemente_FCA intr-un set astfel incat sa am valori unice. 
+        Pentru fiecare valoare o sa am o lista de echipamente (de ex: pt emg cheia o sa fie denumirea electromagnetului 
+        si valoarea o sa fie o lista cu cati electromagneti sunt in filtrul respectiv 
+        'Electromagnet blocare uși control acces': ['E1.1', 'E1.2']
+        In baza cuvintelor cheie din lista_cuvinte_tinta_echipamente_FCA o sa adaug simbolurile elementelor
+        (de ex E1.1, E1.2, Bu1) intr-o lista la care voi aplica join pt a avea E1.2-E1.1-Bu1-MCU1 care va reprezenta
+        cheie pentru dictionarul jurnaului de cabluri'''
+        for denumire in set(dict_elemente_FCA.values()):
+            dict_denumiri_echipamente[denumire] = [key for key, value in dict_elemente_FCA.items() if value == denumire]
+        #print(dict_denumiri_echipamente)
 
-        #adaugarea unui caracter la fiecare valoare dublata astfel incat sa o fac unica in dictionar si sa se
-        # poata face potrivirea cuvantului cheie cu toate valorile din dictionar. Daca nu faceam acest arificiu, atunci
-        # cand aveam 2 cititoare, tot timpul potrivirea se oprea la prima valoare a primului cititor
-        for i in range(len(lista_elemente_dublate)):
-            for key, value in dict_elemente_FCA.items():
-                if lista_elemente_dublate[i] == key:
-                    dict_elemente_FCA.update({key : value + str(i)})
-                    #print(lista_elemente_dublate[i])
+        for item in sorted(dict_denumiri_echipamente.keys()):
+            if lista_cuvinte_tinta_echipamente_FCA[0] in item:
+                if len(dict_denumiri_echipamente[item]) > 0:
+                    for i in range(len(dict_denumiri_echipamente[item])):
+                        lista_emg_bu.append(dict_denumiri_echipamente[item][i])
                 else:
-                    pass
+                    lista_emg_bu.append(dict_denumiri_echipamente[item])
+                # print(dict_denumiri_echipamente[item])
+            elif lista_cuvinte_tinta_echipamente_FCA[1] in item:
+                if len(dict_denumiri_echipamente[item]) > 0:
+                    for i in range(len(dict_denumiri_echipamente[item])):
+                        lista_emg_bu.append(dict_denumiri_echipamente[item][i])
+                else:
+                    lista_emg_bu.append(dict_denumiri_echipamente[item])
+                # print(dict_denumiri_echipamente[item])
+            elif lista_cuvinte_tinta_echipamente_FCA[2] in item:
+                if len(dict_denumiri_echipamente[item]) > 0:
+                    for i in range(len(dict_denumiri_echipamente[item])):
+                        lista_CM.append(dict_denumiri_echipamente[item][i])
+                else:
+                    lista_CM.append(dict_denumiri_echipamente[item])
 
-        """Trebuie avut in vedere ca aici dict_elemente_FCA va avea noi valori fata de cele initiale, asadar, 
-        de aici vom extrage lista ce contine valorile dictionarului dict_elemente_FCA.
-        In aceste valori vom cauta cuvintele cheie, astfel incat sa aflam elementele(cititoare, emg, bu, etc) pe care
-        le vom ordona in jurnalul de cabluri"""
-        #print(dict_elemente_FCA)
-        #cream o lista cu toate denumirile elementelor componente pentru un filtru de CA dupa care
-        lista_denumiri_echipamente_in_FCA = dict_elemente_FCA.values()
-        #print(lista_denumiri_echipamente_in_FCA)
+        """scriu elementele din lista in ordine inversa(de la coada la cap)"""
+        lista_emg_bu = lista_emg_bu[::-1]
+        lista_CM = lista_CM[::-1]
+        #print(lista_CM)
 
-        for valoare in lista_denumiri_echipamente_in_FCA:
-            #for i in range(len(lista_cuvinte_tinta_echipamente_FCA)):
-            if lista_cuvinte_tinta_echipamente_FCA[0] in valoare:
-                cheie = get_key(valoare)
-                #print(cheie)
-                val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
-                    df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
-                dict_de_la_pana_la_CA.update({cheie : val_conectare_la})
-            elif lista_cuvinte_tinta_echipamente_FCA[1] in valoare:
-                cheie = get_key(valoare)
-                #print(cheie)
-                val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
-                    df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'SURSA_ALIMENTARE'].iloc[0]
-                dict_de_la_pana_la_CA.update({cheie : val_conectare_la})
-            elif lista_cuvinte_tinta_echipamente_FCA[2] in valoare:
-                cheie = get_key(valoare)
-                #print(cheie)
-                val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
-                    df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
-                dict_de_la_pana_la_CA.update({cheie : val_conectare_la})
-            elif lista_cuvinte_tinta_echipamente_FCA[3] in valoare:
-                cheie = get_key(valoare)
-                # print(cheie)
-                val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
-                    df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
-                dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
-            elif lista_cuvinte_tinta_echipamente_FCA[4] in valoare:
-                cheie = get_key(valoare)
-                # print(cheie)
-                val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
-                    df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
-                dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
-            elif lista_cuvinte_tinta_echipamente_FCA[5] in valoare:
-                cheie = get_key(valoare)
-                # print(cheie)
-                val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
-                    df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
-                dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
-            elif lista_cuvinte_tinta_echipamente_FCA[6] in valoare:
-                cheie = get_key(valoare)
-                if cheie not in lista_emg_BU:
-                    lista_emg_BU.append(cheie)
-                    #print(lista_emg_BU)
-            elif lista_cuvinte_tinta_echipamente_FCA[7] in valoare:
-                cheie = get_key(valoare)
-                cheie_concat = (cheie + '-') + df_echip_pt_jurnal_cabluri_CA.loc[
-                    df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'CONECTARE_LA'].iloc[0]
-                print(cheie_concat)
-                """cheie_concat este variabila ce stocheaza MCU-BU pt a putea crea in jurnalul de cabluri 
-                             E-BU-MCU la SA"""
-                if cheie_concat not in lista_emg_BU:
-                    lista_emg_BU.append(cheie_concat)
-                    print(lista_emg_BU)
-                val_conectare_la = df_echip_pt_jurnal_cabluri_CA.loc[
-                    df_echip_pt_jurnal_cabluri_CA['SIMBOL_ECHIPAMENT'] == cheie, 'SURSA_ALIMENTARE'].iloc[0]
-        print(val_conectare_la)
-        #print(lista_emg_BU)
-        caracter_de_separare = '-'
-        lista_emg_BU_cu_caract_separare = caracter_de_separare.join(lista_emg_BU[::-1])
-        cheie = lista_emg_BU_cu_caract_separare
-        #print(val_conectare_la)
-        dict_de_la_pana_la_CA.update({cheie: val_conectare_la})
-        lista_emg_BU.clear()
+        """creez variabilele care stocheaza modulul de control acces si sursa de alimentare aferente FCA-ului iterat. 
+        Sunt necesare pentru a avea ca rezultat E1.2-E1.1-Bu1-MCU1 : SA1
+        Exemplu: var_modul_CA = MCU1 si var_SA_FCA = SA1  pt iteratia MCA1"""
+        var_modul_CA = dict_coresp_pt_toate_elem[lista_emg_bu[0]]
+        var_SA_FCA = dict_coresp_pt_toate_elem[var_modul_CA]
+        print(var_SA_FCA)
+        # if len(lista_CM) > 0:
+        #     var_CM = lista_CM[0]
+        # print(var_CM)
+        """adaug simbolul sursei de alimentare in lista_mg_bu pentru ca vreau sa o sterg din dictionarul 
+        dict_corespondenta_elemente_FCA. Stergerea o fac strict pentru a avea o ordine in afisarea elementelor 
+        in jurnalul de cabluri"""
+        #lista_emg_bu.append(var_SA_FCA)
+        #lista_emg_bu.extend(lista_CM)
+        var_SA_Filtru_de_control_acces = dict_coresp_pt_toate_elem[var_SA_FCA]
+        # var_CM_Filtru_de_control_acces = dict_coresp_pt_toate_elem[var_CM]
+        print(var_SA_Filtru_de_control_acces)
+        print(lista_emg_bu)
 
+        """din dictionarul dict_corespondenta_elemente_FCA elimin elementele pentru care am facut join (E1.2-E1.1-Bu1) 
+        dupa care o sa adaug in dictionar E1.2-E1.1-Bu1 ca si cheie iar ca valoare va fi sursa la care se conecteaza 
+        electromagnetii """
+        for item in lista_emg_bu:
+            dict_corespondenta_elemente_FCA.pop(item)
+        """sterg simbolul sursei de alimentare din lista_emg_bu astfel incat sa nu apara in E1.2-E1.1-Bu1 atunci cand
+        se face join cu elementele din lista"""
+        #lista_emg_bu.remove(var_SA_FCA)
+
+        # for CM in lista_CM:
+        #     lista_emg_bu.remove(CM)
+        #dict_corespondenta_elemente_FCA[var_CM] = str(var_CM_Filtru_de_control_acces)
+        cheie_emg_bu_MCA = '-'.join(lista_emg_bu) + '-' + str(var_modul_CA)
+        dict_corespondenta_elemente_FCA[cheie_emg_bu_MCA] = str(var_SA_FCA)
+        #dict_corespondenta_elemente_FCA[var_SA_FCA] = str(var_SA_Filtru_de_control_acces)
+
+        #print(dict_corespondenta_elemente_FCA, cheie_emg_bu_MCA, var_SA_FCA)
+        dict_de_la_pana_la_CA.update(dict_corespondenta_elemente_FCA)
     print(dict_de_la_pana_la_CA)
-    #print(lista_emg_BU)
     return dict_de_la_pana_la_CA
+
 
 def serie_de_la_jurnal_cabluri_CA(dict_de_la_pana_la_CA):
     simboluri_echip_jurnal_cabl_CA = dict_de_la_pana_la_CA.keys()

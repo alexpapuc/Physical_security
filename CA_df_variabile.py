@@ -69,7 +69,7 @@ trebui sa scot  din string, primul simbol pana in caracterul '-' (in cazul nostr
 sa se poata face maparea simbolurilor pentru identificarea tipurilor de cabluri (coloana tip cablu) corespunzatoare
 fiecarui simbol din coloana DE LA """
 lista_simboluri_pt_tip_cablu = scoate_primul_simbol_din_echip_inseriate(dict_elem_CA_de_la_pana_la)
-#print(lista_simboluri_pt_tip_cablu)
+print(lista_simboluri_pt_tip_cablu)
 
 serie_tip_cabluri_CA = serie_tip_cabluri_jurnal_CA(df_echip_pt_jurnal_cabluri, lista_simboluri_pt_tip_cablu)
 

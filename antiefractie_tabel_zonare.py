@@ -28,7 +28,7 @@ def creare_tabel_zonare():
                                                                              'Denumire_element',
                                                                              'COD_ECHIPAMENT',
                                                                              'DENUMIRE_ZONA_PROTEJATA']])
-    # print(df_zone_fara_denumire_z_protejata)
+    #print(df_zone_fara_denumire_z_protejata)
     lst_zone_fara_denumire_z_protejata = list(df_zone_fara_denumire_z_protejata['NUMAR_ZONA'])
     if len(lst_zone_fara_denumire_z_protejata) == 1:
         print(f'Zona {lst_zone_fara_denumire_z_protejata} nu are definita zona pe care o protejeaza. Completeaza'
