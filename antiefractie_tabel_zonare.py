@@ -206,7 +206,7 @@ def creare_tabel_zonare():
                                      'PARTITIE': 'Aria', 'DENUMIRE_ZONA_PROTEJATA': 'Zonă protejată'}, inplace=True)
 
         # scriem tabelul zonare in fisierul cu toate informatiile despre efractie
-        zonare_table.to_excel(writer, sheet_name='Zonare', index=True)
+        #zonare_table.to_excel(writer, sheet_name='Zonare', index=True)
 
         df_zonare_table = df_zonare_table.astype(str)
         df_zonare_table.rename(columns={'nr_crt_zonare': 'efr_zonare_nr_crt',

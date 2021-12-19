@@ -37,6 +37,7 @@ lst_coduri_echip_pt_fise_tehnice = []
 read_pwr_supply_labels = df_intrussion_dwg["INDEX"]
 list_pwr_supply_labels = []
 for item in read_pwr_supply_labels:
+    #print(item)
     if item not in list_pwr_supply_labels:
         list_pwr_supply_labels.append(item)
         list_pwr_supply_labels.sort()

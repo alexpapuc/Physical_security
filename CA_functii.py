@@ -801,7 +801,7 @@ def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
                                      df_FCA.get_group(FCA)['CONECTARE_LA']))
 
         #print(dict_elemente_FCA, dict_corespondenta_elemente_FCA)
-
+        """lista_cuvinte_tinta_echipamente_FCA este pt elemente care se inseriaza"""
         lista_cuvinte_tinta_echipamente_FCA = ['lectromagnet',
                                                'urgen',
                                                'ontact']
@@ -818,7 +818,7 @@ def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
         'Electromagnet blocare uși control acces': ['E1.1', 'E1.2']
         In baza cuvintelor cheie din lista_cuvinte_tinta_echipamente_FCA o sa adaug simbolurile elementelor
         (de ex E1.1, E1.2, Bu1) intr-o lista la care voi aplica join pt a avea E1.2-E1.1-Bu1-MCU1 care va reprezenta
-        cheie pentru dictionarul jurnaului de cabluri'''
+        cheie pentru dictionarul jurnalului de cabluri'''
         for denumire in set(dict_elemente_FCA.values()):
             dict_denumiri_echipamente[denumire] = [key for key, value in dict_elemente_FCA.items() if value == denumire]
         #print(dict_denumiri_echipamente)
@@ -847,6 +847,7 @@ def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
 
         """scriu elementele din lista in ordine inversa(de la coada la cap)"""
         lista_emg_bu = lista_emg_bu[::-1]
+        #print(lista_emg_bu)
         lista_CM = lista_CM[::-1]
         #print(lista_CM)
 
@@ -854,25 +855,27 @@ def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
         Sunt necesare pentru a avea ca rezultat E1.2-E1.1-Bu1-MCU1 : SA1
         Exemplu: var_modul_CA = MCU1 si var_SA_FCA = SA1  pt iteratia MCA1"""
         var_modul_CA = dict_coresp_pt_toate_elem[lista_emg_bu[0]]
+        #print(var_modul_CA)
+        #var_SA_FCA = var_modul_CA
         var_SA_FCA = dict_coresp_pt_toate_elem[var_modul_CA]
-        print(var_SA_FCA)
+        #print(var_SA_FCA)
         # if len(lista_CM) > 0:
         #     var_CM = lista_CM[0]
         # print(var_CM)
-        """adaug simbolul sursei de alimentare in lista_mg_bu pentru ca vreau sa o sterg din dictionarul 
+        """adaug simbolul sursei de alimentare in lista_emg_bu pentru ca vreau sa o sterg din dictionarul 
         dict_corespondenta_elemente_FCA. Stergerea o fac strict pentru a avea o ordine in afisarea elementelor 
         in jurnalul de cabluri"""
         #lista_emg_bu.append(var_SA_FCA)
         #lista_emg_bu.extend(lista_CM)
-        var_SA_Filtru_de_control_acces = dict_coresp_pt_toate_elem[var_SA_FCA]
-        # var_CM_Filtru_de_control_acces = dict_coresp_pt_toate_elem[var_CM]
-        print(var_SA_Filtru_de_control_acces)
-        print(lista_emg_bu)
+
+        #print(var_SA_Filtru_de_control_acces)
+        #print(lista_emg_bu)
 
         """din dictionarul dict_corespondenta_elemente_FCA elimin elementele pentru care am facut join (E1.2-E1.1-Bu1) 
         dupa care o sa adaug in dictionar E1.2-E1.1-Bu1 ca si cheie iar ca valoare va fi sursa la care se conecteaza 
         electromagnetii """
         for item in lista_emg_bu:
+            #print(item)
             dict_corespondenta_elemente_FCA.pop(item)
         """sterg simbolul sursei de alimentare din lista_emg_bu astfel incat sa nu apara in E1.2-E1.1-Bu1 atunci cand
         se face join cu elementele din lista"""
@@ -881,8 +884,20 @@ def dict_elemente_de_la_pana_la_CA(df_echip_pt_jurnal_cabluri_CA, lista_FCA):
         # for CM in lista_CM:
         #     lista_emg_bu.remove(CM)
         #dict_corespondenta_elemente_FCA[var_CM] = str(var_CM_Filtru_de_control_acces)
-        cheie_emg_bu_MCA = '-'.join(lista_emg_bu) + '-' + str(var_modul_CA)
-        dict_corespondenta_elemente_FCA[cheie_emg_bu_MCA] = str(var_SA_FCA)
+        """introduc var_SA_Filtru_de_control_acces = dict_coresp_pt_toate_elem[var_SA_FCA] pentru a genera KeyError,
+        atunci cand am doar filtre de control acces de tip usa evacuare(SA,Emg, si BU). La acest tip de filtre de CA
+        se va genera un key error pt ca TE nu apare in keys si astfel se executa liniile de sub except"""
+        try:
+            var_SA_Filtru_de_control_acces = dict_coresp_pt_toate_elem[var_SA_FCA]
+            cheie_emg_bu_MCA = '-'.join(lista_emg_bu) + '-' + str(var_modul_CA)
+            #print(cheie_emg_bu_MCA)
+            dict_corespondenta_elemente_FCA[cheie_emg_bu_MCA] = str(var_SA_FCA)
+        except KeyError:
+            cheie_emg_bu_MCA = '-'.join(lista_emg_bu)
+            #print(cheie_emg_bu_MCA)
+            dict_corespondenta_elemente_FCA[cheie_emg_bu_MCA] = str(var_modul_CA)
+
+
         #dict_corespondenta_elemente_FCA[var_SA_FCA] = str(var_SA_Filtru_de_control_acces)
 
         #print(dict_corespondenta_elemente_FCA, cheie_emg_bu_MCA, var_SA_FCA)

@@ -112,21 +112,52 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
         nr_frame = 6
         nr_zile_de_inregistrare = 20
         nr_ore_de_inregistrare = 24
-        spatiu_ocupat_1280x720 = 0.0927
-        spatiu_ocupat_1920x1080 = 0.20857
-        spatiu_stocare = spatiu_ocupat_1280x720 * nr_camere_per_DVR * nr_frame * nr_zile_de_inregistrare * nr_ore_de_inregistrare
+        dict_rezolutie = { '1MP' : 0.0927, '2MP' : 0.20857}
+        #spatiu_ocupat_1280x720 = 0.0927
+        #spatiu_ocupat_1920x1080 = 0.20857
+        rezolutie_selectata = str(input(f'Introdu rezolutia {dict_rezolutie.keys()} la care se va executa calculul HDD'))
+        #spatiu_stocare = spatiu_ocupat_1280x720 * nr_camere_per_DVR * nr_frame * nr_zile_de_inregistrare * nr_ore_de_inregistrare
+        if rezolutie_selectata == '1MP':
+            TVCI_descriere_rezolutie = \
+            """Pentru o cameră video a cărei înregistrare este setată la 1fps, la o rezoluție de 1280x720 este 
+ocupat pe HDD un volum de date de:
+\t1280 x 720 x 3 x 1 = 2764800 Byte = 2700Kb = 2,637Mb
+\tRezultă volumul de date stocate într-o oră:
+\t2,637 x 3600 = 9492,188 Mb = 9,270 Gb
+\tPentru o rată de compresie (medie) de 100:1 rezultă pentru o oră, un volum de date de:
+\t9,270 / 100 x 1 = 0,0927 Gb"""
+            print(TVCI_descriere_rezolutie)
+        elif rezolutie_selectata == '2MP':
+            TVCI_descriere_rezolutie = \
+            """Pentru o cameră video a cărei înregistrare este setată la 1fps, la o rezoluţie de 1920x1080 este 
+ocupat pe HDD un volum de date de:
+\t1920 x 1080 x 3 x 1 = 6220800 Byte = 6705 Kb = 5,933Mb
+\tRezultă volumul de date stocate într-o oră:
+\t5,933 x 3600 = 21357,421 Mb = 20,857 Gb
+\tPentru o rată de compresie (medie) de 100:1 rezultă pentru o oră, un volum de date de:
+\t20,857 / 100 x 1 = 0,20857 Gb"""
+            print(TVCI_descriere_rezolutie)
 
+        spatiu_stocare = dict_rezolutie[rezolutie_selectata] * nr_camere_per_DVR * nr_frame * nr_zile_de_inregistrare * nr_ore_de_inregistrare
+        print(spatiu_stocare)
         # creeez variabilele la care voi atribui valorile ce se vor afisa sub calculele pentru capacitatea HDD-urilor
         TVCI_recorder_label = f'{list_DVR_NVR_labels[i]}'
         TVCI_nr_camere_recorder = f'{nr_camere_per_DVR}'
         TVCI_nr_frame = f'{nr_frame}'
-        TVCI_rezolutie_720P = f'{spatiu_ocupat_1280x720:.4f}'
+        #TVCI_rezolutie_720P = f'{spatiu_ocupat_1280x720:.4f}'
+        TVCI_rezolutie_720P = f'{dict_rezolutie[rezolutie_selectata]:.5f}'
         TVCI_nr_zile_inregistrare = f'{nr_zile_de_inregistrare}'
         TVCI_nr_ore_inregistrare = f'{nr_ore_de_inregistrare}'
         TVCI_spatiu_stocare = f'{spatiu_stocare:.2f}'
 
-
-        if spatiu_stocare < 2000:
+        if spatiu_stocare > 2000 :
+            spatiu_stocare_injumatatit = spatiu_stocare * 12/24
+            TVCI_capacit_HDD_injumatatita = \
+            f"""Din teste, s-a stabilit că în regim de ȋnregistrare la mişcare(motion detection) se înregistrează 
+            imagini pentru fiecare cameră, în medie, 12 ore pe zi. Rezultă astfel un volum de date de:
+            {TVCI_spatiu_stocare}Gb x 12 / 24 = {spatiu_stocare_injumatatit:.2f}Gb"""
+            print(TVCI_capacit_HDD_injumatatita)
+        if spatiu_stocare <= 2000:
             # cream variabila filt pentru a face verificarea cu baza de date pt codul de HDD
             # !!!! Atentie!!! Daca codul de HDD este schimbat sau sters din baza de date, HDD-ul nu va mai fi alocat la lista de cantitati
             filt = (df_db_TVCI['COD_ECHIPAMENT'] == 'WD20PURX')
@@ -146,7 +177,8 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
             TVCI_capacitate_HDD = capacitate_HDD
 
             dict_TVCI_calcule_HDD = {}
-            dict_TVCI_calcule_HDD.update({'TVCI_denumire_NVR' + str(i) : TVCI_recorder_label,
+            dict_TVCI_calcule_HDD.update({'TVCI_descriere_rezolutie' + str(i): TVCI_descriere_rezolutie,
+                                          'TVCI_denumire_NVR' + str(i) : TVCI_recorder_label,
                                           'TVCI_nr_camere_recorder' + str(i) : TVCI_nr_camere_recorder,
                                           'TVCI_nr_frame' + str(i) : TVCI_nr_frame,
                                           'TVCI_nr_zile_inreg' + str(i) : TVCI_nr_zile_inregistrare,
@@ -160,7 +192,8 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
 # {spatiu_ocupat_1280x720:.4f} x {nr_camere_per_DVR} x {nr_frame} x {nr_zile_de_inregistrare} x {nr_ore_de_inregistrare} = {spatiu_stocare:.2f} GB')
 
         else:
-            if spatiu_stocare < 4000:
+            #if spatiu_stocare < 4000:
+            if spatiu_stocare_injumatatit < 4000:
                 filt = (df_db_TVCI['COD_ECHIPAMENT'] == 'WD40PURX')
                 df_HDD = pd.DataFrame(df_db_TVCI.loc[
                                           filt, ['Denumire_element', 'COD_ECHIPAMENT', 'Cantitate', 'Producător',
@@ -177,7 +210,9 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
                 TVCI_capacitate_HDD = capacitate_HDD
 
                 dict_TVCI_calcule_HDD = {}
-                dict_TVCI_calcule_HDD.update({'TVCI_denumire_NVR' + str(i): TVCI_recorder_label,
+                dict_TVCI_calcule_HDD.update({'TVCI_capacit_HDD_injumatatita' + str(i): TVCI_capacit_HDD_injumatatita,
+                                              'TVCI_descriere_rezolutie' + str(i): TVCI_descriere_rezolutie,
+                                              'TVCI_denumire_NVR' + str(i): TVCI_recorder_label,
                                               'TVCI_nr_camere_recorder' + str(i): TVCI_nr_camere_recorder,
                                               'TVCI_nr_frame' + str(i): TVCI_nr_frame,
                                               'TVCI_nr_zile_inreg' + str(i): TVCI_nr_zile_inregistrare,
@@ -191,7 +226,8 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
 # {spatiu_ocupat_1280x720:.4f} x {nr_camere_per_DVR} x {nr_frame} x {nr_zile_de_inregistrare} x {nr_ore_de_inregistrare} = {spatiu_stocare:.2f} GB')
 
             else:
-                if spatiu_stocare < 6000:
+                #if spatiu_stocare < 6000:
+                if spatiu_stocare_injumatatit < 6000:
                     filt = (df_db_TVCI['COD_ECHIPAMENT'] == 'WD60PURX')
                     df_HDD = pd.DataFrame(df_db_TVCI.loc[
                                               filt, ['Denumire_element', 'COD_ECHIPAMENT', 'Cantitate', 'Producător',
@@ -208,7 +244,9 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
                     TVCI_capacitate_HDD = capacitate_HDD
 
                     dict_TVCI_calcule_HDD = {}
-                    dict_TVCI_calcule_HDD.update({'TVCI_denumire_NVR' + str(i): TVCI_recorder_label,
+                    dict_TVCI_calcule_HDD.update({'TVCI_capacit_HDD_injumatatita' + str(i): TVCI_capacit_HDD_injumatatita,
+                                                  'TVCI_descriere_rezolutie' + str(i): TVCI_descriere_rezolutie,
+                                                  'TVCI_denumire_NVR' + str(i): TVCI_recorder_label,
                                                   'TVCI_nr_camere_recorder' + str(i): TVCI_nr_camere_recorder,
                                                   'TVCI_nr_frame' + str(i): TVCI_nr_frame,
                                                   'TVCI_nr_zile_inreg' + str(i): TVCI_nr_zile_inregistrare,
@@ -223,7 +261,8 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
 # {spatiu_ocupat_1280x720:.4f} x {nr_camere_per_DVR} x {nr_frame} x {nr_zile_de_inregistrare} x {nr_ore_de_inregistrare} = {spatiu_stocare:.2f} GB')
 
                 else:
-                    if spatiu_stocare < 8000:
+                    #if spatiu_stocare < 8000:
+                    if spatiu_stocare_injumatatit < 8000:
                         # trebuie creat dictionar pt hard disk de 2TB
                         # trebuie apelata functia care adauga hard disk-ul la lista de cantitati
                         filt = (df_db_TVCI['COD_ECHIPAMENT'] == 'WD80PURX')
@@ -241,7 +280,9 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
                         TVCI_capacitate_HDD = capacitate_HDD
 
                         dict_TVCI_calcule_HDD = {}
-                        dict_TVCI_calcule_HDD.update({'TVCI_denumire_NVR' + str(i): TVCI_recorder_label,
+                        dict_TVCI_calcule_HDD.update({'TVCI_capacit_HDD_injumatatita' + str(i): TVCI_capacit_HDD_injumatatita,
+                                                      'TVCI_descriere_rezolutie' + str(i): TVCI_descriere_rezolutie,
+                                                      'TVCI_denumire_NVR' + str(i): TVCI_recorder_label,
                                                       'TVCI_nr_camere_recorder' + str(i): TVCI_nr_camere_recorder,
                                                       'TVCI_nr_frame' + str(i): TVCI_nr_frame,
                                                       'TVCI_nr_zile_inreg' + str(i): TVCI_nr_zile_inregistrare,
@@ -256,7 +297,8 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
 # {spatiu_ocupat_1280x720:.4f} x {nr_camere_per_DVR} x {nr_frame} x {nr_zile_de_inregistrare} x {nr_ore_de_inregistrare} = {spatiu_stocare:.2f} GB')
 
                     else:
-                        if spatiu_stocare < 10000:
+                        #if spatiu_stocare < 10000:
+                        if spatiu_stocare_injumatatit < 10000:
                             filt = (df_db_TVCI['COD_ECHIPAMENT'] == 'WD100PURZ')
 
                             df_HDD = pd.DataFrame(df_db_TVCI.loc[
@@ -274,7 +316,9 @@ Asociati camere la NVR/DVR dupa care executati din nou programul!''')
                         TVCI_capacitate_HDD = capacitate_HDD
 
                         dict_TVCI_calcule_HDD = {}
-                        dict_TVCI_calcule_HDD.update({'TVCI_denumire_NVR' + str(i): TVCI_recorder_label,
+                        dict_TVCI_calcule_HDD.update({'TVCI_capacit_HDD_injumatatita' + str(i): TVCI_capacit_HDD_injumatatita,
+                                                      'TVCI_descriere_rezolutie' + str(i): TVCI_descriere_rezolutie,
+                                                      'TVCI_denumire_NVR' + str(i): TVCI_recorder_label,
                                                       'TVCI_nr_camere_recorder' + str(i): TVCI_nr_camere_recorder,
                                                       'TVCI_nr_frame' + str(i): TVCI_nr_frame,
                                                       'TVCI_nr_zile_inreg' + str(i): TVCI_nr_zile_inregistrare,
