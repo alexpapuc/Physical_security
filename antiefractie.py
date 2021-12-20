@@ -4,6 +4,9 @@ import xlrd
 from math import ceil
 from itertools import chain
 
+pd.set_option('display.max_columns', 20)
+pd.set_option('display.width', 2000)
+
 try:
     df_db = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_efractie.xlsx')
 
@@ -218,9 +221,12 @@ def creare_tabele_calcul_consum(i, battery, nr_of_battery):
     # sortez in functie de coloana 'CONSUM_VEGHE' si 'CONSUM_ALARMA' (consumurile mari sunt afisate primele)
     # table_calc_final = table_calc_final.sort_values(by=['CONSUM_VEGHE', 'CONSUM_ALARMA'], ascending=False)
     # table_calc_final
-    # la tabelul cu consumul echipamentelor pt o sursa de alimentare adaug linia cu consumul total pentru curentii de veghe si de alarma
-    table_calc_final1 = pd.DataFrame(table_calc_final.append(df_pwr_supply_calculation.iloc[i]))
-
+    """la tabelul cu consumul echipamentelor pt o sursa de alimentare adaug linia 
+    cu consumul total pentru curentii de veghe si de alarma.
+    Am facut table_calc_final1 = table_calc_final pt a nu mai schimba denumirea table_calc_final1 mai jos in cod """
+    #table_calc_final1 = pd.DataFrame(table_calc_final.append(df_pwr_supply_calculation.iloc[i]))
+    table_calc_final1 = table_calc_final
+    #print(table_calc_final1)
     table_calc_final1 = table_calc_final1.fillna(0)
     #putem aplica applymap cu lambda insa rezultatul este acelasi ca cel dat de linia in care setez int pt nt_crt si cantitate
     #table_calc_final1 = table_calc_final1.applymap(lambda x: int(round(x, 0)) if isinstance(x, (int, float)) else x)
@@ -245,6 +251,7 @@ def creare_tabele_calcul_consum(i, battery, nr_of_battery):
     # creez variabilele total_crt_veghe si total_crt_alarma pentru a putea afisa/scrie valorile in fisierul excel
     total_crt_veghe = table_calc_final['TOTAL CONSUM VEGHE'].sum() / 1000
     total_crt_alarma = table_calc_final['TOTAL CONSUM ALARMA'].sum() / 1000
+    #print(table_calc_final['TOTAL CONSUM VEGHE'].sum(),table_calc_final['TOTAL CONSUM ALARMA'].sum())
     # scriu in fisierul excel formula de calcul pentru calculul acumulatorului
     # folosesc functia ceil(pentru asta am importat modulul math)pt a face rotunjire la 1 chiar daca
     # valoarea acumulatorului este sub 0.5 de ex 1.15 se va rotunji la 1, 1.55 se va rotunji tot la 1
@@ -256,6 +263,8 @@ def creare_tabele_calcul_consum(i, battery, nr_of_battery):
     i_crt_alarma = f'{total_crt_alarma:.4f}'
     nr_acc = f'{nr_of_battery:.2f}'
     nr_acc_rounded = f'{int(ceil(nr_of_battery))}'
+    totall_crt_veghe_mA = f'{table_calc_final["TOTAL CONSUM VEGHE"].sum():.1f}'
+    totall_crt_alarma_mA = f'{table_calc_final["TOTAL CONSUM ALARMA"].sum():.1f}'
 
     #creare dictionar cu valori ce se afiseaza in descrierea calculelor de sub tabelul de calcul consum curent efractie
     dict_val_tabel_consum_efr = {}
@@ -265,7 +274,9 @@ def creare_tabele_calcul_consum(i, battery, nr_of_battery):
                                       'efr_acc_SA'+str(i) : str(battery),
                                       'efr_nr_acc_SA'+str(i) : nr_acc,
                                       'efr_acc_SA'+str(i) : str(battery),
-                                      'efr_acc_rounded_SA'+str(i) : nr_acc_rounded})
+                                      'efr_acc_rounded_SA'+str(i) : nr_acc_rounded,
+                                      'efr_consum_TOTALL_veghe'+str(i) : totall_crt_veghe_mA,
+                                      'efr_consum_TOTALL_alarma'+str(i) : totall_crt_alarma_mA})
 
     # creare dictionar pentru a scrie tabelul de calcul consum curent efractie in fisierul template word
     df_tabel_consum_efr = table_calc_final1
@@ -282,7 +293,7 @@ def creare_tabele_calcul_consum(i, battery, nr_of_battery):
                                         'Consum total alarma': 'efr_consum_total_alarma'+str(i)}, inplace=True)
 
     dict_df_tabel_consum_efr = df_tabel_consum_efr.to_dict('records')
-
+    #print(dict_df_tabel_consum_efr,dict_val_tabel_consum_efr)
     #adaugam lista de dictionare in lst si asa avem toate valorile pentru tabelele de calcul acumulatoare instr-o singura lista
     return lst.append(dict_df_tabel_consum_efr), lst_var_SA.append(dict_val_tabel_consum_efr)
 
