@@ -19,7 +19,10 @@ except FileNotFoundError as exception_label:
     print(f' Fisierul {exception_label} nu se afla in folderul radacina')
     sys.exit(3)
 # creez data frame df.pwr_supply din df_intrussion_dwg (din tabelul exportat din Autocad), in care afisez coloanele "SURSA_ALIMENTARE", "CONSUM_VEGHE", "CONSUM_ALARMA" , le grupez dupa coloana "SURSA_ALIMENTARE" si le adun .sum()
-df_pwr_supply = df_intrussion_dwg[["INDEX", "CONSUM_VEGHE", "CONSUM_ALARMA"]].groupby(["INDEX"]).sum()
+#df_pwr_supply = df_intrussion_dwg[["INDEX", "CONSUM_VEGHE", "CONSUM_ALARMA"]].groupby(["INDEX"]).sum()
+df_pwr_supply = pd.merge(df_intrussion_dwg, df_db, on='COD_ECHIPAMENT')[
+    ["INDEX", "CONSUM_VEGHE_y", "CONSUM_ALARMA_y"]].groupby(["INDEX"]).sum()
+#print(df_pwr_supply.columns)
 # creez un nou data frame df_pwr_supply_calculation derivat din df_pwr_supply
 df_pwr_supply_calculation = pd.DataFrame(df_pwr_supply)
 # redenumesc coloanele astfel incat acest df sa il adaug la dataframe-ul cu lista de ecehipamente/consum pt fiecare sursa din sistem
@@ -47,43 +50,6 @@ for item in read_pwr_supply_labels:
 list_pwr_supply_labels
 
 
-# prin functia check_items() fac verificarea daca un cod de echipament este scris gresit sau nu se afla in vreunul din cele 2 dataframe-uri
-def check_items():
-    # citesc codurile de echipamente din df_intrussion_dwg si le introduc in lista read_check_list
-    read_check_list = df_intrussion_dwg["COD_ECHIPAMENT"]
-    # creez o noua lista in care introduc valori unice ale codurilor de chipamente(elimin codurile care apar de mai multe ori)
-    check_list = []
-    # introduc valori unice ale codurilor de chipamente(elimin codurile care apar de mai multe ori) in lista check_list
-    for item in read_check_list:
-        if item not in check_list:
-            check_list.append(item)
-        # list_pwr_supply_labels.sort()
-    # print(check_list)
-    # citesc codurile de echipamente din baza de date a sistemului antiefractie
-    read_check_list_db = df_db['COD_ECHIPAMENT']
-    check_list_db = []
-    # introduc valori unice ale codurilor de chipamente(elimin codurile care apar de mai multe ori) in lista check_list_db
-    for item in read_check_list_db:
-        if item not in check_list_db:
-            check_list_db.append(item)
-    # print(check_list_db)
-    # fac verificarea codurilor de echipamente exportate din autocad cu cele existente in baza de date
-    # in cazul in care codurile de echipamente exportate nu se regasesc in baza de date sau baza de date nu contine vreun cod
-    #  din codurile exportate programul va afisa acest lucru
-    for item in check_list:
-        if item not in check_list_db:
-            print("\n \n \n Codul de produs", item, "nu se afla in baza de date sau a fost scris gresit")
-            sys.exit(2)
-        else:
-            continue
-
-            # print("Toate elementele folosite se regasesc in baza de date")
-            # continue
-            # sys.exit(2)
-
-
-check_items()
-
 def verificare_simboluri_echipamente():
     lista_simboluri_echipamente_efr = list(df_intrussion_dwg['SIMBOL_ECHIPAMENT'])
     #print(lista_simboluri_echipamente_efr)
@@ -104,94 +70,258 @@ def verificare_simboluri_echipamente():
     #continue
 verificare_simboluri_echipamente()
 
-# Avand in vedere faptul ca lista cu echipamentele pe care le exportam din dwg poate sa aiba valori gresite sau sa nu aiba valori completate
-# pe anumite coloane(in special 'COD_ECHIPAMENT','CONSUM_VEGHE', 'CONSUM_ALARMA' - in baza carora facem calcule)
-# am creat functia verific_echip_inainte_de_calcule_consum() astfel incat sa verific fiecare linie din fisierul exportat din dwg cu
-# elementele existente in baza de date
-# verificarea se face pt fiecare valoare de pe coloanele 'COD_ECHIPAMENT','CONSUM_VEGHE', 'CONSUM_ALARMA'
-# in momentul in care elementele exportate din dwg au diferente fata de baza de date, aceste elemente sunt afisate si vor trebui
-# modificate manual, astfel incat sa nu fie diferente
-def verific_echip_inainte_de_calcule_consum():
-    # df_db = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_efractie.xlsx')
-    # df_intrussion_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.csv')
-    # df_intrussion_dwg.head()
 
-    # citesc fisierul exportat din dwg si il afisez in functie de coloanele'COD_ECHIPAMENT','CONSUM_VEGHE', 'CONSUM_ALARMA'
-    df_equipments_from_dwg = df_intrussion_dwg[['COD_ECHIPAMENT', 'CONSUM_VEGHE', 'CONSUM_ALARMA']]
-    df_equipments_from_dwg
-    # creez o lista cu valorile de pe coloana 'COD_ECHIPAMENT' din fisierul exportat din dwg
-    list_equip_codes_from_dwg = list(df_equipments_from_dwg['COD_ECHIPAMENT'])
-    # creez data frame df_from_db din df_db cu colanele 'COD_ECHIPAMENT','CONSUM_VEGHE','CONSUM_ALARMA'
-    df_from_db = pd.DataFrame(
-        df_db[['COD_ECHIPAMENT', 'CONSUM_VEGHE', 'CONSUM_ALARMA']].sort_values(by=['COD_ECHIPAMENT'], ascending=True))
-    # creez o lista cu valorile de pe coloana 'COD_ECHIPAMENT' din baza de date
-    list_equip_codes_from_db = list(df_from_db['COD_ECHIPAMENT'])
-    # list_equip_codes_from_db
-    # creez o lista goala in care voi introduce valorile de pe coloana 'COD_ECHIPAMENT' din df_from_db pe care nu vreau sa le afisez in data frame-ul final
-    list_equip_codes_need_dropped = []
-    # itezez lista list_equip_codes_from_db si introduc in lista list_equip_codes_need_dropped valorile pe care nu vreau sa le afisez in data frame-ul final
-    for item in list_equip_codes_from_db:
-        if item not in list_equip_codes_from_dwg:
-            list_equip_codes_need_dropped.append(item)
+# def verific_echip_inainte_de_calcule_consum():
+#     """Avand in vedere faptul ca lista cu echipamentele pe care le exportam din dwg poate sa aiba valori
+#     gresite sau sa nu aiba valori completate
+#     pe anumite coloane(in special 'COD_ECHIPAMENT','CONSUM_VEGHE', 'CONSUM_ALARMA' - in baza carora facem calcule)
+#     am creat functia verific_echip_inainte_de_calcule_consum() astfel incat sa verific fiecare linie din fisierul
+#     exportat din dwg cu
+#     elementele existente in baza de date
+#     verificarea se face pt fiecare valoare de pe coloanele 'COD_ECHIPAMENT','CONSUM_VEGHE', 'CONSUM_ALARMA'
+#     in momentul in care elementele exportate din dwg au diferente fata de baza de date, aceste elemente sunt
+#     afisate si vor trebui modificate manual, astfel incat sa nu fie diferente"""
+#     # df_db = pd.read_excel(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\db_efractie.xlsx')
+#     # df_intrussion_dwg = pd.read_csv(r'C:\Users\alexa\Desktop\Proiecte PyCharm\Pandas Safe World Design\zonare.csv')
+#     # df_intrussion_dwg.head()
+#
+#     # citesc fisierul exportat din dwg si il afisez in functie de coloanele'COD_ECHIPAMENT','CONSUM_VEGHE', 'CONSUM_ALARMA'
+#     df_equipments_from_dwg = df_intrussion_dwg[['COD_ECHIPAMENT', 'CONSUM_VEGHE', 'CONSUM_ALARMA']]
+#     df_equipments_from_dwg
+#     # creez o lista cu valorile de pe coloana 'COD_ECHIPAMENT' din fisierul exportat din dwg
+#     list_equip_codes_from_dwg = list(df_equipments_from_dwg['COD_ECHIPAMENT'])
+#     # creez data frame df_from_db din df_db cu colanele 'COD_ECHIPAMENT','CONSUM_VEGHE','CONSUM_ALARMA'
+#     df_from_db = pd.DataFrame(
+#         df_db[['COD_ECHIPAMENT', 'CONSUM_VEGHE', 'CONSUM_ALARMA']].sort_values(by=['COD_ECHIPAMENT'], ascending=True))
+#     # creez o lista cu valorile de pe coloana 'COD_ECHIPAMENT' din baza de date
+#     list_equip_codes_from_db = list(df_from_db['COD_ECHIPAMENT'])
+#     # list_equip_codes_from_db
+#     # creez o lista goala in care voi introduce valorile de pe coloana 'COD_ECHIPAMENT' din df_from_db pe care nu vreau sa le afisez in data frame-ul final
+#     list_equip_codes_need_dropped = []
+#     # itezez lista list_equip_codes_from_db si introduc in lista list_equip_codes_need_dropped valorile pe care nu vreau sa le afisez in data frame-ul final
+#     for item in list_equip_codes_from_db:
+#         if item not in list_equip_codes_from_dwg:
+#             list_equip_codes_need_dropped.append(item)
+#
+#     # print(list_equip_codes_need_dropped)
+#     # sterg liniile din df_from_db ale caror coduri de echipament nu sunt aceleasi cu codurile de echipament din df df_equipments_from_dwg(codurile de echipamente exportate din dwg)
+#     df_from_db = df_from_db.drop(
+#         df_from_db[df_from_db.COD_ECHIPAMENT.isin(list_equip_codes_need_dropped)].index.tolist())
+#     # df_from_db
+#     # df_equipments_from_dwg
+#
+#     # facem verificarea daca fiecare linie(toate valorile unei linii) din df df_equipments_from_dwg se regasesc in df_from_db
+#     # https://stackoverflow.com/questions/40514187/check-if-multiple-rows-exist-in-another-dataframe
+#     checked_df = pd.merge(df_equipments_from_dwg, df_from_db, indicator=True, how='outer')
+#     # print(checked_df)
+#     # pentru a afisa dataframe-ul din care elementele ce vor fi afisate fac parte, redenumim valorile de pe noua coloana '_merge'
+#     # ce se creeaza odata cu verificarea facuta prin merge(vezi linia de mai sus)
+#     checked_df = checked_df.replace({'_merge': {'left_only': 'fisier din DWG', 'right_only': 'baza de date'}})
+#     # vreau sa afisez o lista cu elementele ce nu se potrivesc intre df exportat din dwg si baza de date
+#     # pt asta introduc valorile de pe coloana '_merge' intr-o lista pe care o iterez
+#     # daca am alte valori in afara de "both" le afisez dupa care intrerup executia script-ului
+#     list_merged_df = list(checked_df['_merge'])
+#     list_merged_values = []
+#     for item in list_merged_df:
+#         if item == 'both':
+#             continue
+#         else:
+#             list_merged_values.append(item)
+#             # print(list_merged_values)
+#             # filt = (checked_df != 'both')
+#             checked_df = checked_df.loc[checked_df._merge.isin(list_merged_values)]
+#             print(checked_df)
+#             print(''' \n \n Echipamentul/Echipamentele din lista de mai sus au diferente fata de baza de date.
+# In cazul in care pe coloana cod echipament codurile sunt corecte, verifica valorile din coloana cod echipament
+# in baza de date!!! ''')
+#             sys.exit(2)
+#
+#
+# verific_echip_inainte_de_calcule_consum()
 
-    # print(list_equip_codes_need_dropped)
-    # sterg liniile din df_from_db ale caror coduri de echipament nu sunt aceleasi cu codurile de echipament din df df_equipments_from_dwg(codurile de echipamente exportate din dwg)
-    df_from_db = df_from_db.drop(
-        df_from_db[df_from_db.COD_ECHIPAMENT.isin(list_equip_codes_need_dropped)].index.tolist())
-    # df_from_db
-    # df_equipments_from_dwg
 
-    # facem verificarea daca fiecare linie(toate valorile unei linii) din df df_equipments_from_dwg se regasesc in df_from_db
-    # https://stackoverflow.com/questions/40514187/check-if-multiple-rows-exist-in-another-dataframe
-    checked_df = pd.merge(df_equipments_from_dwg, df_from_db, indicator=True, how='outer')
-    # print(checked_df)
-    # pentru a afisa dataframe-ul din care elementele ce vor fi afisate fac parte, redenumim valorile de pe noua coloana '_merge'
-    # ce se creeaza odata cu verificarea facuta prin merge(vezi linia de mai sus)
-    checked_df = checked_df.replace({'_merge': {'left_only': 'fisier din DWG', 'right_only': 'baza de date'}})
-    # vreau sa afisez o lista cu elementele ce nu se potrivesc intre df exportat din dwg si baza de date
-    # pt asta introduc valorile de pe coloana '_merge' intr-o lista pe care o iterez
-    # daca am alte valori in afara de "both" le afisez dupa care intrerup executia script-ului
-    list_merged_df = list(checked_df['_merge'])
-    list_merged_values = []
-    for item in list_merged_df:
-        if item == 'both':
-            continue
-        else:
-            list_merged_values.append(item)
-            # print(list_merged_values)
-            # filt = (checked_df != 'both')
-            checked_df = checked_df.loc[checked_df._merge.isin(list_merged_values)]
-            print(checked_df)
-            print(''' \n \n Echipamentul/Echipamentele din lista de mai sus au diferente fata de baza de date. 
-In cazul in care pe coloana cod echipament codurile sunt corecte, verifica valorile din coloana cod echipament 
-in baza de date!!! ''')
+def check_items():
+    """Verificam daca codurile de echipamente citite din dwg se regasesc in baza de date. Daca nu se regasesc atunci
+    acestea vor trebui introduse in baza de date"""
+
+    # read equipment codes from df_intrussion_dwg and introducing them into a set in order to have a unique
+    # equipment code in variable read_check_list
+    read_check_list = set(list(df_intrussion_dwg["COD_ECHIPAMENT"]))
+    #print(read_check_list)
+    """read all equipment codes from intrussion database(df_db_CA) and store them in read_check_list_db list
+    in order to verify if all equipment codes from read_check_list are in intrussion database or not.
+    If they are not in intrussion database function verific_echip_inainte_de_calcule_consum() will print out
+    all codes that are not in intrussion database and ask the user to introduce that equipments in database"""
+    read_check_list_db = list(df_db['COD_ECHIPAMENT'])
+    #print(read_check_list_db)
+
+    for equipment_code in read_check_list:
+        if equipment_code not in read_check_list_db:
+            print(f' Codul de produs {equipment_code} nu se afla in baza de date sau a fost scris gresit!'
+                  f' Introduceti codul de produs in baza de date!')
             sys.exit(2)
+check_items()
 
 
-verific_echip_inainte_de_calcule_consum()
-#df_acumulatoare = pd.DataFrame(columns=['COD_ECHIPAMENT', 'CANTITATE'])
-
-# writer = pd.ExcelWriter('C:\\Users\\alexa\\Desktop\\calc_acum.xlsx', engine='xlsxwriter')
+# def creare_tabele_calcul_consum(i, battery, nr_of_battery):
+#     # din functia calcul_capacitate_acumulatoare() aduc ca argumente i, capacitatile bateriilor si nr_of_battery
+#     # creez variablia filt7 care selecteaza elementele din df_intrussion_dwg care au pe coloana "SURSA_ALIMENTARE" denumirea sursei din
+#     # lista de surse de alimentare si au consumul de veghe sau consumul de alarma > 0
+#     filt7 = ((df_intrussion_dwg["INDEX"] == list_pwr_supply_labels[i]) & (
+#             (df_intrussion_dwg["CONSUM_VEGHE"] > 0) | (df_intrussion_dwg["CONSUM_ALARMA"] > 0)))
+#     # creez data frame-ul table_calc din data frame df_intrussion_dwg si fac afisare pe coloana(.loc) pt valorile selectate de variablia filt7
+#     # si in plus adaug coloanele "COD_ECHIPAMENT","CANTITATE","CONSUM_VEGHE", "CONSUM_ALARMA" la acest dataframe
+#     table_calc = pd.DataFrame(
+#         df_intrussion_dwg.loc[filt7, ["COD_ECHIPAMENT", "CANTITATE", "CONSUM_VEGHE", "CONSUM_ALARMA"]])
+#     # transform valorile din coloana ["CANTITATE"] in valori intregiDENUMIRE_ECHIPAMENT
+#     table_calc["CANTITATE"] = table_calc["CANTITATE"].astype('int')
+#     # creez un nou dataframe table_calc_int care grupeaza elementele din dataframe-ul table_calc dupa "COD_ECHIPAMENT" si face suma pt "CANTITATE", "CONSUM_VEGHE", "CONSUM_ALARMA"
+#     table_calc_int = table_calc.groupby("COD_ECHIPAMENT")[["CANTITATE", "CONSUM_VEGHE", "CONSUM_ALARMA"]].sum()
+#     # redenumesc coloanele "CONSUM_VEGHE" : "TOTAL CONSUM VEGHE", "CONSUM_ALARMA" : "TOTAL CONSUM ALARMA" pt ca atunci cand se face merge cu
+#     # baza de date denumirile coloanelor sunt aceleasi si nu se pot diferentia
+#     table_calc_int.rename(columns={"CONSUM_VEGHE": "TOTAL CONSUM VEGHE", "CONSUM_ALARMA": "TOTAL CONSUM ALARMA"},
+#                           inplace=True)
+#     # combin elementele din dataframe-ul table_calc_int cu elementele din baza de date df_db in functie de codurile de echipament
+#     # se vor afisa doar elementele ale caror coduri de echipament se regasesc in dataframe-ul table_calc_int si in df_db(baza de date)
+#     # prin functia check_items() fac verificarea daca un cod de echipament este scris gresit sau nu se afla in vreunul din cele 2 dataframe-uri
+#     table_calc_merge_with_db = pd.merge(table_calc_int, df_db, on='COD_ECHIPAMENT')
+#     # creez data frame-ul table_calc_final in care afisez informatiile bazat pe coloanele necesare
+#     table_calc_final = pd.DataFrame(table_calc_merge_with_db[
+#                                         ['Denumire_element', 'COD_ECHIPAMENT', 'TENSIUNE_ALIMENTARE_DE_BAZA',
+#                                          'TENSIUNE_ALIMENTARE_DE_REZERVA', 'CONSUM_VEGHE', 'CONSUM_ALARMA',
+#                                          'CANTITATE',
+#                                          'TOTAL CONSUM VEGHE', 'TOTAL CONSUM ALARMA', 'Nr. Crt']])
+#     table_calc_final.sort_values(by=['Nr. Crt'], inplace=True)
+#     table_calc_final = table_calc_final[
+#         ['Denumire_element', 'COD_ECHIPAMENT', 'TENSIUNE_ALIMENTARE_DE_BAZA', 'TENSIUNE_ALIMENTARE_DE_REZERVA',
+#          'CONSUM_VEGHE', 'CONSUM_ALARMA', 'CANTITATE', 'TOTAL CONSUM VEGHE', 'TOTAL CONSUM ALARMA']]
+#     table_calc_final.reset_index(drop=True, inplace=True)
+#     table_calc_final.index = table_calc_final.index + 1
+#     table_calc_final['nr_crt'] = table_calc_final.index
+#
+#     # # creez o serie pe care o denumesc Total si care este egala cu suma coloanei 'Consum total (W)'
+#     # Total = table_calc_final['TOTAL CONSUM VEGHE'].sum()
+#     # # setez 'Total' ca index pt linia de Total si pentru toate coloanele vom avea NaN doar pentru coloana 'Consum total (W)' vom avea totalul
+#     # table_calc_final.loc['Total'] = pd.Series(table_calc_final['TOTAL CONSUM VEGHE'].sum(),
+#     #                                           index=['TOTAL CONSUM VEGHE'])
+#     # # pt ca functia sa poata returna un data frame creez acest data frame
+#     # table_calc_final = pd.DataFrame(table_calc_final)
+#
+#     # sortez in functie de coloana 'CONSUM_VEGHE' si 'CONSUM_ALARMA' (consumurile mari sunt afisate primele)
+#     # table_calc_final = table_calc_final.sort_values(by=['CONSUM_VEGHE', 'CONSUM_ALARMA'], ascending=False)
+#     # table_calc_final
+#     """la tabelul cu consumul echipamentelor pt o sursa de alimentare adaug linia
+#     cu consumul total pentru curentii de veghe si de alarma.
+#     Am facut table_calc_final1 = table_calc_final pt a nu mai schimba denumirea table_calc_final1 mai jos in cod """
+#     #table_calc_final1 = pd.DataFrame(table_calc_final.append(df_pwr_supply_calculation.iloc[i]))
+#     table_calc_final1 = table_calc_final
+#     #print(table_calc_final1)
+#     table_calc_final1 = table_calc_final1.fillna(0)
+#     #putem aplica applymap cu lambda insa rezultatul este acelasi ca cel dat de linia in care setez int pt nt_crt si cantitate
+#     #table_calc_final1 = table_calc_final1.applymap(lambda x: int(round(x, 0)) if isinstance(x, (int, float)) else x)
+#     # def check_float_values(x):
+#     #     if x > int(x):
+#     #         return x
+#     #     else:
+#     #         return int(x)
+#     # table_calc_final1 = table_calc_final1.applymap(lambda x: check_float_values(x) if isinstance(x, (int, float)) else x)
+#     table_calc_final1[['nr_crt','CANTITATE']] = table_calc_final1[['nr_crt','CANTITATE']].astype(int)
+#
+#     # redenumesc coloanele asa cum vreau sa fie afisate in tabelul final
+#     table_calc_final1.rename(columns={"Denumire_element": "Denumire element", "COD_ECHIPAMENT": "Cod echipament",
+#                                       "TENSIUNE_ALIMENTARE_DE_BAZA": "Tensiune alimentare de baza",
+#                                       "TENSIUNE_ALIMENTARE_DE_REZERVA": "Tensiune alimentare de rezerva",
+#                                       "CONSUM_VEGHE": "Consum veghe", "CONSUM_ALARMA": "Consum alarma",
+#                                       "CANTITATE": "Cantitate", "TOTAL CONSUM VEGHE": "Consum total veghe",
+#                                       "TOTAL CONSUM ALARMA": "Consum total alarma"}, inplace=True)
+#
+#     # scriu dataframe-ul cu tabelul de consum pt o sursa de alimentare in fisierul excel ce va avea sheet-urile denumite cu denumirile surselor de alimentare
+#     # table_calc_final1.to_excel(writer, sheet_name=list_pwr_supply_labels[i], index=True)
+#     # creez variabilele total_crt_veghe si total_crt_alarma pentru a putea afisa/scrie valorile in fisierul excel
+#     total_crt_veghe = table_calc_final['TOTAL CONSUM VEGHE'].sum() / 1000
+#     total_crt_alarma = table_calc_final['TOTAL CONSUM ALARMA'].sum() / 1000
+#     #print(table_calc_final['TOTAL CONSUM VEGHE'].sum(),table_calc_final['TOTAL CONSUM ALARMA'].sum())
+#     # scriu in fisierul excel formula de calcul pentru calculul acumulatorului
+#     # folosesc functia ceil(pentru asta am importat modulul math)pt a face rotunjire la 1 chiar daca
+#     # valoarea acumulatorului este sub 0.5 de ex 1.15 se va rotunji la 1, 1.55 se va rotunji tot la 1
+#     text_power_supply = (
+#         f' N= 1,25 x [({total_crt_veghe:.4f} x 24ore) + ({total_crt_alarma:.4f} x 0,5ore)] / {battery} Ah => N = {nr_of_battery:.2f} \
+#     Numărul de acumulatoare de 12V/{battery}Ah necesare pentru sursa {list_pwr_supply_labels[i]} este N= {int(ceil(nr_of_battery))}.')
+#
+#     i_crt_veghe = f'{total_crt_veghe:.4f}'
+#     i_crt_alarma = f'{total_crt_alarma:.4f}'
+#     nr_acc = f'{nr_of_battery:.2f}'
+#     nr_acc_rounded = f'{int(ceil(nr_of_battery))}'
+#     totall_crt_veghe_mA = f'{table_calc_final["TOTAL CONSUM VEGHE"].sum():.1f}'
+#     totall_crt_alarma_mA = f'{table_calc_final["TOTAL CONSUM ALARMA"].sum():.1f}'
+#
+#     #creare dictionar cu valori ce se afiseaza in descrierea calculelor de sub tabelul de calcul consum curent efractie
+#     dict_val_tabel_consum_efr = {}
+#     dict_val_tabel_consum_efr.update({'efr_consum_SA'+str(i) : list_pwr_supply_labels[i],
+#                                       'efr_i_veghe_SA'+str(i) : i_crt_veghe,
+#                                       'efr_i_alarma_SA'+str(i) : i_crt_alarma,
+#                                       'efr_acc_SA'+str(i) : str(battery),
+#                                       'efr_nr_acc_SA'+str(i) : nr_acc,
+#                                       'efr_acc_SA'+str(i) : str(battery),
+#                                       'efr_acc_rounded_SA'+str(i) : nr_acc_rounded,
+#                                       'efr_consum_TOTALL_veghe'+str(i) : totall_crt_veghe_mA,
+#                                       'efr_consum_TOTALL_alarma'+str(i) : totall_crt_alarma_mA})
+#
+#     # creare dictionar pentru a scrie tabelul de calcul consum curent efractie in fisierul template word
+#     df_tabel_consum_efr = table_calc_final1
+#     df_tabel_consum_efr = df_tabel_consum_efr.astype(str)
+#     df_tabel_consum_efr.rename(columns={'nr_crt': 'efr_consum_nr_crt'+str(i),
+#                                         'Denumire element': 'efr_consum_denumire_element'+str(i),
+#                                         'Cod echipament': 'efr_consum_tip_element'+str(i),
+#                                         'Tensiune alimentare de baza': 'efr_consum_tens_baza'+str(i),
+#                                         'Tensiune alimentare de rezerva': 'efr_consum_tens_rez'+str(i),
+#                                         'Consum veghe': 'efr_consum_crt_veghe'+str(i),
+#                                         'Consum alarma': 'efr_consum_crt_alarma'+str(i),
+#                                         'Cantitate': 'efr_consum_cantitate'+str(i),
+#                                         'Consum total veghe': 'efr_consum_total_veghe'+str(i),
+#                                         'Consum total alarma': 'efr_consum_total_alarma'+str(i)}, inplace=True)
+#
+#     dict_df_tabel_consum_efr = df_tabel_consum_efr.to_dict('records')
+#     #print(dict_df_tabel_consum_efr,dict_val_tabel_consum_efr)
+#     #adaugam lista de dictionare in lst si asa avem toate valorile pentru tabelele de calcul acumulatoare instr-o singura lista
+#     return lst.append(dict_df_tabel_consum_efr), lst_var_SA.append(dict_val_tabel_consum_efr)
 
 
 def creare_tabele_calcul_consum(i, battery, nr_of_battery):
+    """Facem merge intre fisierul df_intrussion_dwg si baza de date astfel incat pentru fiecare cod de echipament
+    sa avem toate caracteristicile(denumire, valorile pentru consumul in alarma si veghe, etc). Atunci cand facem merge
+    si exista coloane cu acelasi nume, coloanele aferente fisierului din stanga se autodenumeste nume_coloana_x, iar
+    pentru fisierul din dreapta avem nume_coloana_y. Acesta este motivul pentru care se regaseste CONSUM_VEGHE_y,
+    CONSUM_ALARMA_y mai jos in cod."""
+    df_intrussion_dwg_merged_with_db  = pd.merge(df_intrussion_dwg, df_db, on='COD_ECHIPAMENT')
+    #print(df_intrussion_dwg_merged_with_db.columns)
+
     # din functia calcul_capacitate_acumulatoare() aduc ca argumente i, capacitatile bateriilor si nr_of_battery
-    # creez variablia filt7 care selecteaza elementele din df_intrussion_dwg care au pe coloana "SURSA_ALIMENTARE" denumirea sursei din
-    # lista de surse de alimentare si au consumul de veghe sau consumul de alarma > 0
-    filt7 = ((df_intrussion_dwg["INDEX"] == list_pwr_supply_labels[i]) & (
-            (df_intrussion_dwg["CONSUM_VEGHE"] > 0) | (df_intrussion_dwg["CONSUM_ALARMA"] > 0)))
-    # creez data frame-ul table_calc din data frame df_intrussion_dwg si fac afisare pe coloana(.loc) pt valorile selectate de variablia filt7
+    # creez variablia filt7 care selecteaza elementele din df_intrussion_dwg care au pe coloana "SURSA_ALIMENTARE"
+    # denumirea sursei din lista de surse de alimentare si au consumul de veghe sau consumul de alarma > 0
+    filt7 = ((df_intrussion_dwg_merged_with_db["INDEX"] == list_pwr_supply_labels[i]) & (
+            (df_intrussion_dwg_merged_with_db["CONSUM_VEGHE_y"] > 0) | (df_intrussion_dwg_merged_with_db
+                                                                      ["CONSUM_ALARMA_y"] > 0)))
+    #print(filt7)
+    # creez data frame-ul table_calc din data frame df_intrussion_dwg si fac afisare pe coloana(.loc) pt valorile
+    # selectate de variablia filt7
     # si in plus adaug coloanele "COD_ECHIPAMENT","CANTITATE","CONSUM_VEGHE", "CONSUM_ALARMA" la acest dataframe
     table_calc = pd.DataFrame(
-        df_intrussion_dwg.loc[filt7, ["COD_ECHIPAMENT", "CANTITATE", "CONSUM_VEGHE", "CONSUM_ALARMA"]])
-    # transform valorile din coloana ["CANTITATE"] in valori intregi
+        df_intrussion_dwg_merged_with_db.loc[filt7, ["COD_ECHIPAMENT",
+                                                     "CANTITATE",
+                                                     "CONSUM_VEGHE_y",
+                                                     "CONSUM_ALARMA_y"]])
+    # print(table_calc)
+    # transform valorile din coloana ["CANTITATE"] in valori intregiDENUMIRE_ECHIPAMENT
     table_calc["CANTITATE"] = table_calc["CANTITATE"].astype('int')
     # creez un nou dataframe table_calc_int care grupeaza elementele din dataframe-ul table_calc dupa "COD_ECHIPAMENT" si face suma pt "CANTITATE", "CONSUM_VEGHE", "CONSUM_ALARMA"
-    table_calc_int = table_calc.groupby("COD_ECHIPAMENT")[["CANTITATE", "CONSUM_VEGHE", "CONSUM_ALARMA"]].sum()
+    table_calc_int = table_calc.groupby("COD_ECHIPAMENT")[["CANTITATE", "CONSUM_VEGHE_y", "CONSUM_ALARMA_y"]].sum()
     # redenumesc coloanele "CONSUM_VEGHE" : "TOTAL CONSUM VEGHE", "CONSUM_ALARMA" : "TOTAL CONSUM ALARMA" pt ca atunci cand se face merge cu
     # baza de date denumirile coloanelor sunt aceleasi si nu se pot diferentia
-    table_calc_int.rename(columns={"CONSUM_VEGHE": "TOTAL CONSUM VEGHE", "CONSUM_ALARMA": "TOTAL CONSUM ALARMA"},
+    table_calc_int.rename(columns={"CONSUM_VEGHE_y": "TOTAL CONSUM VEGHE", "CONSUM_ALARMA_y": "TOTAL CONSUM ALARMA"},
                           inplace=True)
+
+    #print (table_calc_int)
     # combin elementele din dataframe-ul table_calc_int cu elementele din baza de date df_db in functie de codurile de echipament
     # se vor afisa doar elementele ale caror coduri de echipament se regasesc in dataframe-ul table_calc_int si in df_db(baza de date)
     # prin functia check_items() fac verificarea daca un cod de echipament este scris gresit sau nu se afla in vreunul din cele 2 dataframe-uri
@@ -296,8 +426,6 @@ def creare_tabele_calcul_consum(i, battery, nr_of_battery):
     #print(dict_df_tabel_consum_efr,dict_val_tabel_consum_efr)
     #adaugam lista de dictionare in lst si asa avem toate valorile pentru tabelele de calcul acumulatoare instr-o singura lista
     return lst.append(dict_df_tabel_consum_efr), lst_var_SA.append(dict_val_tabel_consum_efr)
-
-
 
 
 # functie pentru calculul capacitatii acumulatoarelor necesare la fiecare sursa de alimentare in parte
